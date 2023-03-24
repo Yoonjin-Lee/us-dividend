@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">UsDividend</string>
+    <!--  LoginActivity  -->
+    <string name="project_name">미주정복</string>
+    <string name="naver_login">네이버 로그인</string>
+    <string name="kakao_login">카카오 로그인</string>
+</resources>
