@@ -4,4 +4,14 @@
     <string name="project_name">미주정복</string>
     <string name="naver_login">네이버 로그인</string>
     <string name="kakao_login">카카오 로그인</string>
+    <string name="title_activity_navigation_bar">NavigationBarActivity</string>
+    <!--  NavigationBarActivity  -->
+    <string name="money">돈</string>
+    <string name="setting">설정</string>
+    <string name="stock">주식</string>
+    <!--  StockScreen  -->
+    <string name="dollar_exchange">현재 달러 환율 :</string>
+    <string name="my_dollars">보유 달러 : $</string>
+    <string name="won">원</string>
+    <string name="reset">초기화</string>
 </resources>
