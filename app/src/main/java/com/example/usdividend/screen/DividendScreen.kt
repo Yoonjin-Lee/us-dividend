@@ -6,10 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun SettingScreen(
-    modifier: Modifier
-) {
-    Row(modifier = modifier) {
-        Text(text = "setting")
+fun DividendScreen(
+){
+    Row(modifier = Modifier) {
+        Text(text = "hi")
     }
 }

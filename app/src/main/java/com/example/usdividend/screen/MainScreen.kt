@@ -26,23 +26,32 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.usdividend.data.NaviDestination
+import com.example.usdividend.screen.StockScreen
+import com.example.usdividend.screen.stockList
 import com.example.usdividend.ui.theme.UsDividendTheme
 
 @Composable
 fun MainScreen() {
     var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf<ItemList>(
-        ItemList(
+    val items = listOf<NaviDestination>(
+        NaviDestination(
             ImageVector.vectorResource(id = R.drawable.money_icon),
-            name = "배당"
+            "배당",
+            "dividned",
+//            { DividendScreen() }
         ),
-        ItemList(
+        NaviDestination(
             ImageVector.vectorResource(id = R.drawable.stock_icon),
-            name = "주식"
+            "주식",
+            "stock",
+//            { StockScreen(stockList = stockList)}
         ),
-        ItemList(
+        NaviDestination(
             ImageVector.vectorResource(id = R.drawable.setting_icon),
-            name = "설정"
+            name = "설정",
+            "setting",
+//            { SettingScreen() }
         )
     )
     Scaffold(
@@ -65,7 +74,10 @@ fun MainScreen() {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedItem == index,
-                        onClick = { selectedItem = index },
+                        onClick = {
+                            selectedItem = index
+
+                        },
                         icon = {
                             Icon(
                                 imageVector = item.icon,
@@ -81,26 +93,27 @@ fun MainScreen() {
                             unselectedIconColor = colorResource(id = R.color.gray),
                             unselectedTextColor = colorResource(id = R.color.gray)
                         )
-
                     )
                 }
             }
         },
         content = {
-            //content depended on Navigation selectedItem
-            when(selectedItem){
-                0 -> DividendScreen(modifier = Modifier.padding(it))
-                1 -> StockScreen(modifier = Modifier.padding(it))
-                2 -> SettingScreen(modifier = Modifier.padding(it))
+            //content depended on NavigationBar's selectedItem
+            when (selectedItem) {
+                0 -> Box(modifier = Modifier.padding(it)) {
+                    DividendScreen()
+                }
+                1 -> Box(modifier = Modifier.padding(it)) {
+                    //Box에만 modifier를 주고 띄울 스크린에는 modifier를 주면 안 되는 구나..
+                    StockScreen(stockList = stockList)
+                }
+                2 -> Box(modifier = Modifier.padding(it)) {
+                    SettingScreen()
+                }
             }
         }
     )
 }
-
-data class ItemList(
-    val icon: ImageVector,
-    val name: String
-)
 
 
 @Preview(showSystemUi = true, showBackground = true)

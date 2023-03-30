@@ -14,4 +14,19 @@
     <string name="my_dollars">보유 달러 : $</string>
     <string name="won">원</string>
     <string name="reset">초기화</string>
+    <string name="my_stock">보유 주식</string>
+    <string name="add">추가</string>
+    <string name="quantity">수량 :</string>
+    <string name="dividend">배당금 : $</string>
+    <string name="exchange">구매 환율 :</string>
+    <string name="price">매입가 : $</string>
+    <!--  StockInputScreen  -->
+    <string name="stock_input">주식 정보 입력</string>
+    <string name="stock_name">주식 이름</string>
+    <string name="stock_price">매입가</string>
+    <string name="stock_quantity">수량</string>
+    <string name="stock_dividend">배당금</string>
+    <string name="stock_name_info">영어로 적어주세요</string>
+    <string name="stock_price_info">숫자만 적어주세요</string>
+    <string name="check">확인</string>
 </resources>
