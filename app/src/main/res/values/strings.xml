@@ -26,6 +26,7 @@
     <string name="stock_price">매입가</string>
     <string name="stock_quantity">수량</string>
     <string name="stock_dividend">배당금</string>
+    <string name="stock_exchange">구매 환율</string>
     <string name="stock_name_info">영어로 적어주세요</string>
     <string name="stock_price_info">숫자만 적어주세요</string>
     <string name="check">확인</string>

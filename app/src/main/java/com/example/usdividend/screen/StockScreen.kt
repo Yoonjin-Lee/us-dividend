@@ -1,5 +1,17 @@
 package com.example.usdividend.screen
 
+import android.app.Activity.RESULT_OK
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_MUTABLE
+import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,9 +21,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -25,15 +39,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import com.example.usdividend.MainActivity
 import com.example.usdividend.R
+import com.example.usdividend.StockInputActivity
+import com.example.usdividend.data.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 
 @Composable
 fun StockScreen(
-    stockList: java.util.ArrayList<StockListCard>
+    context: Context
 ) {
-    Add()
+    var stockList = remember {
+        mutableStateListOf<StockListCard>()
+    }
+
+//    stockList.add(
+//        StockListCard(
+//            "Apple", "3", "1.2", "1300", "130"
+//        )
+//    )
+    val intent = Intent(context, StockInputActivity::class.java)
+
+    val register = object : OnStockRegister{
+        override fun register(stockListCard: StockListCard) {
+            stockList.add(stockListCard)
+            Log.d("stockList", "완료")
+            Log.d("stockList", "${stockList.size}")
+        }
+    }
+    setStockRegister(register)
+
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -128,7 +165,10 @@ fun StockScreen(
                         modifier = Modifier.padding(7.dp, 13.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f, true))
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = {
+                            startActivity(context, intent, null)
+                        }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_round_plus),
                             contentDescription = stringResource(id = R.string.add)
@@ -220,26 +260,11 @@ fun StockListDump(stockListCard: StockListCard) {
     }
 }
 
-data class StockListCard(
-    val company: String,
-    val quantity: String,
-    val dividend: String,
-    val exchange: String,
-    val price: String
-)
-
-val stockList = java.util.ArrayList<StockListCard>()
-
-fun Add() {
-    stockList.add(
-        StockListCard("Apple", "3", "2.1", "1300", "130")
-    )
-}
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewStockScreen() {
-    StockScreen(stockList = stockList)
+//    StockScreen(stockList = stockList)
 }
 
 @Preview(showSystemUi = true, showBackground = true)
