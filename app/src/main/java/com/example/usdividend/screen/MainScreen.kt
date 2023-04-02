@@ -1,5 +1,8 @@
 package com.example.usdividend
 
+import android.content.Context
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -26,32 +29,38 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.usdividend.data.NaviDestination
 import com.example.usdividend.screen.StockScreen
-import com.example.usdividend.screen.stockList
 import com.example.usdividend.ui.theme.UsDividendTheme
 
 @Composable
-fun MainScreen() {
-    var selectedItem by remember { mutableStateOf(0) }
+fun MainScreen(
+    context: Context
+) {
+    var selectedItem by remember { mutableStateOf(1) }
+
+    val navController = rememberNavController()
+
+
     val items = listOf<NaviDestination>(
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.money_icon),
             "배당",
-            "dividned",
-//            { DividendScreen() }
+            "dividendScreen"
         ),
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.stock_icon),
             "주식",
-            "stock",
-//            { StockScreen(stockList = stockList)}
+            "stockScreen"
         ),
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.setting_icon),
             name = "설정",
-            "setting",
-//            { SettingScreen() }
+            "settingScreen"
         )
     )
     Scaffold(
@@ -76,7 +85,13 @@ fun MainScreen() {
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
-
+                            navController.navigate(item.route) {
+                                navController.graph.startDestinationRoute?.let {
+                                    popUpTo(it) { saveState = true }
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
                         icon = {
                             Icon(
@@ -98,28 +113,32 @@ fun MainScreen() {
             }
         },
         content = {
-            //content depended on NavigationBar's selectedItem
-            when (selectedItem) {
-                0 -> Box(modifier = Modifier.padding(it)) {
-                    DividendScreen()
-                }
-                1 -> Box(modifier = Modifier.padding(it)) {
-                    //Box에만 modifier를 주고 띄울 스크린에는 modifier를 주면 안 되는 구나..
-                    StockScreen(stockList = stockList)
-                }
-                2 -> Box(modifier = Modifier.padding(it)) {
-                    SettingScreen()
-                }
+            Box(Modifier.padding(it)){
+                NavigationGraph(navController = navController, context = context)
             }
         }
     )
 }
 
+@Composable
+fun NavigationGraph(navController: NavHostController, context: Context) {
+    NavHost(navController = navController, startDestination = "stockScreen") {
+        composable("dividendScreen") {
+            DividendScreen()
+        }
+        composable("stockScreen") {
+            StockScreen(context)
+        }
+        composable("settingScreen") {
+            SettingScreen()
+        }
+    }
+}
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewMainScreen() {
     UsDividendTheme {
-        MainScreen()
+//        MainScreen()
     }
 }
