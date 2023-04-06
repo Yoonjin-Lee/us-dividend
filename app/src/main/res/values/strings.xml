@@ -30,4 +30,8 @@
     <string name="stock_name_info">영어로 적어주세요</string>
     <string name="stock_price_info">숫자만 적어주세요</string>
     <string name="check">확인</string>
+    <!--  DividendScreen  -->
+    <string name="monthly_dividend">월에 들어올 배당</string>
+    <string name="dot">·</string>
+    <string name="table_title">월별 배당금</string>
 </resources>
