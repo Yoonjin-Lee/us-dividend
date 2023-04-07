@@ -3,13 +3,16 @@ package com.example.usdividend
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
@@ -105,6 +109,7 @@ fun MonthlyList(
 ) {
     Modifier
         .fillMaxWidth()
+        .height(112.dp)
     Column {
         //Title part
         Row(
@@ -127,6 +132,7 @@ fun MonthlyList(
         }
         Box(
             Modifier.padding(18.dp, 0.dp)
+                .height(80.dp)
         ) {
             CompanyList(companyList = companyList)
         }
@@ -148,8 +154,17 @@ fun CompanyList(
 fun CompanyListCard(
     company: String
 ) {
+    var isClicked by remember {
+       mutableStateOf(false)
+    }
+    if (isClicked){
+        DividendDialog(v = true)
+    }
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable { 
+            isClicked = true
+        }
     ) {
         Text(text = stringResource(id = R.string.dot))
         Spacer(modifier = Modifier.padding(2.dp))
