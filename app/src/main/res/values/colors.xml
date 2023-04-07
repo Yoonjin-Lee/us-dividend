@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="main_color">#0070C0</color>
     <color name="gray">#d1d1d1</color>
+    <color name="button_gray">#6d6d6d</color>
+    <color name="dismiss">#ededed</color>
 </resources>
