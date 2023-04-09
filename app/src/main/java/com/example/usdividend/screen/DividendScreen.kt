@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
@@ -37,7 +38,7 @@ import com.github.mikephil.charting.data.BarEntry
 
 @Composable
 fun DividendScreen(
-//    context: Context
+    sharedViewModel: SharedViewModel = viewModel()
 ) {
     var companyList = remember {
         mutableStateListOf<String>()
@@ -48,21 +49,28 @@ fun DividendScreen(
         add("O")
     }
 
+    // dialog에서 변경된 값을 가지고 리스트 요소 삭제
+    if (sharedViewModel.myVariable){
+        companyList.remove(sharedViewModel.myCompany)
+        sharedViewModel.myVariable = false
+    }
+
+    // BarChart data
     val entries: ArrayList<BarEntry> = ArrayList()
-    entries.add(BarEntry(1f, 10f))
-    entries.add(BarEntry(2f, 20f))
-    entries.add(BarEntry(3f, 30f))
-    entries.add(BarEntry(4f, 40f))
-    entries.add(BarEntry(5f, 50f))
-    entries.add(BarEntry(6f, 50f))
-    entries.add(BarEntry(7f, 50f))
-    entries.add(BarEntry(8f, 50f))
-    entries.add(BarEntry(9f, 50f))
-    entries.add(BarEntry(10f, 50f))
-    entries.add(BarEntry(11f, 50f))
-    entries.add(BarEntry(12f, 50f))
-
-
+    entries.apply {
+        entries.add(BarEntry(1f, 10f))
+        entries.add(BarEntry(2f, 20f))
+        entries.add(BarEntry(3f, 30f))
+        entries.add(BarEntry(4f, 40f))
+        entries.add(BarEntry(5f, 50f))
+        entries.add(BarEntry(6f, 50f))
+        entries.add(BarEntry(7f, 50f))
+        entries.add(BarEntry(8f, 50f))
+        entries.add(BarEntry(9f, 50f))
+        entries.add(BarEntry(10f, 50f))
+        entries.add(BarEntry(11f, 50f))
+        entries.add(BarEntry(12f, 50f))
+    }
 
     Column(
         verticalArrangement = Arrangement.Top
@@ -131,7 +139,8 @@ fun MonthlyList(
             )
         }
         Box(
-            Modifier.padding(18.dp, 0.dp)
+            Modifier
+                .padding(18.dp, 0.dp)
                 .height(80.dp)
         ) {
             CompanyList(companyList = companyList)
@@ -154,12 +163,14 @@ fun CompanyList(
 fun CompanyListCard(
     company: String
 ) {
+    // show dialog
     var isClicked by remember {
        mutableStateOf(false)
     }
     if (isClicked){
-        DividendDialog(v = true)
+        DividendDialog(v = true, company)
     }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable { 
