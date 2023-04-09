@@ -1,6 +1,5 @@
 package com.example.usdividend.screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
@@ -28,18 +26,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
+import com.example.usdividend.SharedViewModel
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
 
 @Composable
 fun DividendDialog(
-    v: Boolean
+    v: Boolean,
+    company: String,
+    sharedViewModel: SharedViewModel = viewModel()
 ) {
     var visible by remember {
         mutableStateOf(v)
     }
+
     if (visible) {
         Dialog(
             onDismissRequest = { visible = false },
@@ -101,7 +103,11 @@ fun DividendDialog(
                             )
                         }
                         TextButton( // yes
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                sharedViewModel.myCompany = company
+                                sharedViewModel.myVariable = true
+                                visible = false
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .background(colorResource(id = R.color.main_color))
@@ -120,7 +126,6 @@ fun DividendDialog(
                 }
             }
         }
-
     }
 }
 
@@ -128,6 +133,6 @@ fun DividendDialog(
 @Composable
 fun PreviewDividendDialog() {
     UsDividendTheme {
-        DividendDialog(true)
+        DividendDialog(true, "")
     }
 }
