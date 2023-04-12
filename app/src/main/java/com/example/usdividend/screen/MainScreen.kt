@@ -124,7 +124,7 @@ fun MainScreen(
 fun NavigationGraph(navController: NavHostController, context: Context) {
     NavHost(navController = navController, startDestination = "stockScreen") {
         composable("dividendScreen") {
-            DividendScreen()
+            DividendScreen(context)
         }
         composable("stockScreen") {
             StockScreen(context)
