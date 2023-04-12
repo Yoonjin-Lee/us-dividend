@@ -34,9 +34,14 @@
     <string name="monthly_dividend">월에 들어올 배당</string>
     <string name="dot">·</string>
     <string name="table_title">월별 배당금</string>
-<!--  DividendDialog  -->
+    <string name="dividend_button">내역 보기</string>
+    <!--  DividendDialog  -->
     <string name="no">아니요</string>
     <string name="yes">네</string>
     <string name="dividend_dialog_title">배당금 입금 확인</string>
     <string name="dividend_dialog_content">배당금이 입금된 것을 확인했나요?</string>
+    <!--  DividendHistoryScreen  -->
+    <string name="dividend_history_title">배당 내역</string>
+    <string name="excel_file">엑셀 파일로 보기</string>
+    <string name="month">월</string>
 </resources>
