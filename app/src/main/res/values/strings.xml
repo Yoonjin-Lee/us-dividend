@@ -47,4 +47,6 @@
     <!--  SettingScreen  -->
     <string name="account">계정</string>
     <string name="logout">로그아웃</string>
+    <!--  LogoutDialog  -->
+    <string name="logout_info">로그아웃 하실건가요?</string>
 </resources>
