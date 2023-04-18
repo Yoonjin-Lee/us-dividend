@@ -11,4 +11,6 @@
     <color name="gray">#d1d1d1</color>
     <color name="button_gray">#6d6d6d</color>
     <color name="dismiss">#ededed</color>
+    <string name="red">#d62323</string>
+
 </resources>
