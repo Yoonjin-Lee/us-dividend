@@ -1,33 +1,18 @@
 package com.example.usdividend
 
 import android.content.Context
-import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.material3.BottomAppBarDefaults.windowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.usdividend.data.NaviDestination
 import com.example.usdividend.screen.StockScreen
 import com.example.usdividend.ui.theme.UsDividendTheme
+import com.google.android.material.composethemeadapter.*
 
 @Composable
 fun MainScreen(
@@ -44,7 +30,6 @@ fun MainScreen(
     var selectedItem by remember { mutableStateOf(1) }
 
     val navController = rememberNavController()
-
 
     val items = listOf<NaviDestination>(
         NaviDestination(
@@ -63,12 +48,18 @@ fun MainScreen(
             "settingScreen"
         )
     )
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.stock),
+                        text = when (selectedItem) {
+                            0 -> stringResource(id = R.string.money)
+                            1 -> stringResource(id = R.string.stock)
+                            2 -> stringResource(id = R.string.setting)
+                            else -> "주식"
+                        },
                         color = colorResource(id = R.color.white)
                     )
                 },
@@ -113,7 +104,7 @@ fun MainScreen(
             }
         },
         content = {
-            Box(Modifier.padding(it)){
+            Box(Modifier.padding(it)) {
                 NavigationGraph(navController = navController, context = context)
             }
         }

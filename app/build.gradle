@@ -65,6 +65,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
+    implementation "com.google.android.material:compose-theme-adapter:${compose_version}"
+
     implementation "com.kakao.sdk:v2-all:2.13.0"
     implementation 'com.navercorp.nid:oauth-jdk8:5.4.0'
 
