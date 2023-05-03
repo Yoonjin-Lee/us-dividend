@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.usdividend"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -66,6 +66,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     implementation "com.google.android.material:compose-theme-adapter:${compose_version}"
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
     implementation "com.kakao.sdk:v2-all:2.13.0"
     implementation 'com.navercorp.nid:oauth-jdk8:5.4.0'
