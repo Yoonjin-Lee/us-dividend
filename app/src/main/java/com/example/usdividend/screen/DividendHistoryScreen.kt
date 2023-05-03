@@ -19,8 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.usdividend.R
 import com.example.usdividend.data.DividendHistoryData
+import com.example.usdividend.function.excel
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
+
+
+val DividendHistoryList = ArrayList<DividendHistoryData>()
 
 @Composable
 fun DividendHistoryScreen(
@@ -28,14 +32,12 @@ fun DividendHistoryScreen(
 ) {
     val currentContext = LocalContext.current
 
-    val list = ArrayList<DividendHistoryData>()
-
     var listAdd by remember {
         mutableStateOf(true)
     }
 
     if (listAdd) {
-        list.add(DividendHistoryData("3", "Apple", "1.09"))
+        DividendHistoryList.add(DividendHistoryData("3", "Apple", "1.09"))
         listAdd = false
     }
 
@@ -63,23 +65,34 @@ fun DividendHistoryScreen(
                     }
                 },
                 actions = {
-                    DropDownPart()
+                    DropDownPart(context)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Main)
             )
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                HistoryList(list)
+                HistoryList(DividendHistoryList)
             }
         }
     )
 }
 
 @Composable
-fun DropDownPart() {
+fun DropDownPart(
+    context: Context
+) {
     var dropdown by remember {
         mutableStateOf(false)
+    }
+
+    var excelMaker by remember {
+        mutableStateOf(false)
+    }
+
+    if (excelMaker){
+        excel(context)
+        excelMaker = false
     }
 
     IconButton(onClick = { dropdown = true }) {
@@ -97,7 +110,10 @@ fun DropDownPart() {
     ) {
         DropdownMenuItem(
             text = { Text(text = stringResource(id = R.string.excel_file)) },
-            onClick = { /*TODO*/ })
+            onClick = {
+                excelMaker = true
+            }
+        )
     }
 }
 
@@ -117,8 +133,9 @@ fun HistoryList(
 fun HistoryCard(
     it: DividendHistoryData
 ) {
-    Row(modifier = Modifier
-        .padding(23.dp, 21.dp)
+    Row(
+        modifier = Modifier
+            .padding(23.dp, 21.dp)
     ) {
         Text(
             text = it.month,

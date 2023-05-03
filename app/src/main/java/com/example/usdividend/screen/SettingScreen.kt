@@ -46,7 +46,7 @@ fun SettingTop() {
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
-            text = "닉네임",
+            text = nickname!!,
             modifier = Modifier.padding(12.dp, 20.dp),
             style = TextStyle(
                 fontSize = 20.sp,
@@ -76,7 +76,7 @@ fun SettingAccount() {
                 .background(Gray)
         )
         Text(
-            text = "email",
+            text = email!!,
             style = TextStyle(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Normal,
