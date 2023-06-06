@@ -121,7 +121,7 @@ fun NavigationGraph(navController: NavHostController, context: Context) {
             StockScreen(context)
         }
         composable("settingScreen") {
-            SettingScreen()
+            SettingScreen(context)
         }
     }
 }

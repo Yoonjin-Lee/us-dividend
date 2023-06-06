@@ -1,4 +1,4 @@
-package com.example.usdividend
+package com.example.usdividend.activity
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +29,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import com.example.usdividend.R
+import com.example.usdividend.authService
+import com.example.usdividend.data.NameEmailData
+import com.example.usdividend.data.UserData
+import com.example.usdividend.server.ApiService
+import com.example.usdividend.server.getRetrofit
 import com.example.usdividend.ui.theme.UsDividendTheme
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
@@ -38,6 +46,13 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +92,9 @@ fun LoginPage(
                 .size(250.dp, 250.dp)
         )
         IconButton(
-            onClick = { kakaoLogin(context) },
+            onClick = {
+//                kakaoLogin(context)
+            },
             modifier = Modifier
                 .padding(0.dp, 70.dp, 0.dp, 10.dp)
                 .size(320.dp, 45.dp)
@@ -105,8 +122,10 @@ fun LoginPage(
     }
 }
 
-var email : String? = ""
-var nickname : String? = ""
+var email: String? = null
+var nickname: String? = null
+var userid: Int? = null
+var holdingDollars : Float? = null
 
 fun kakaoLogin(
     context: Context
@@ -121,17 +140,53 @@ fun kakaoLogin(
             UserApiClient.instance.me { user, error ->
                 if (error != null) {
                     Log.e(TAG, "사용자 정보 요청 실패", error)
-                }
-                else if (user != null) {
-                    Log.i(TAG, "사용자 정보 요청 성공" +
-                            "\n이메일: ${user.kakaoAccount?.email}" +
-                            "\n닉네임: ${user.kakaoAccount?.profile?.nickname}")
+                } else if (user != null) {
+                    Log.i(
+                        TAG, "사용자 정보 요청 성공" +
+                                "\n이메일: ${user.kakaoAccount?.email}" +
+                                "\n닉네임: ${user.kakaoAccount?.profile?.nickname}"
+                    )
 
                     email = user.kakaoAccount?.email
                     nickname = user.kakaoAccount?.profile?.nickname
 
-                    val intent = Intent(context, MainActivity::class.java)
-                    startActivity(context, intent, null)
+                    /********************서버 연결***********************/
+                    authService.signUp(NameEmailData(userName = nickname!!, email = email!!)).enqueue(object : Callback<String> {
+                        override fun onResponse(
+                            call: Call<String>,
+                            response: retrofit2.Response<String>
+                        ) {
+                            if (response.isSuccessful) {
+                                val data = JSONObject(JSONObject(response.body().toString()).getString("result"))
+                                val userdata = UserData(
+                                    userId = data.getString("userId").toInt(),
+                                    userName = data.getString("userName"),
+                                    email = data.getString("email"),
+                                    holdingDollar = data.getString("holdingDollar").toFloat()
+                                )
+
+                                if (data != null) {
+                                    //데이터가 잘 왔는지 로그 찍어보기
+                                    Log.d("test_retrofit", "받은 정보 :" + data)
+
+                                    userid = userdata.userId
+                                    holdingDollars = userdata.holdingDollar
+
+                                    /**페이지 넘기기**/
+                                    val intent = Intent(context, MainActivity::class.java)
+                                    startActivity(context, intent, null)
+                                } else {
+                                    //정보를 받지 못했을 때 로그 찍기
+                                    Log.w("retrofit", "실패 ${response.code()}")
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<String>, t: Throwable) {
+                            Log.w("retrofit", "정보 접근 실패", t)
+                            Log.w("retrofit", "정보 접근 실패 response")
+                        }
+                    })
                 }
             }
         }
@@ -157,19 +212,54 @@ fun kakaoLogin(
                 UserApiClient.instance.me { user, error ->
                     if (error != null) {
                         Log.e(TAG, "사용자 정보 요청 실패", error)
-                    }
-                    else if (user != null) {
-                        Log.i(TAG, "사용자 정보 요청 성공" +
-                                "\n이메일: ${user.kakaoAccount?.email}" +
-                                "\n닉네임: ${user.kakaoAccount?.profile?.nickname}")
+                    } else if (user != null) {
+                        Log.i(
+                            TAG, "사용자 정보 요청 성공" +
+                                    "\n이메일: ${user.kakaoAccount?.email}" +
+                                    "\n닉네임: ${user.kakaoAccount?.profile?.nickname}"
+                        )
 
                         // 이메일, 닉네임 가져오기
                         email = user.kakaoAccount?.email
                         nickname = user.kakaoAccount?.profile?.nickname
 
-                        val intent = Intent(context, MainActivity::class.java)
-                        startActivity(context, intent, null)
-                    }
+                        /********************서버 연결***********************/
+                        authService.signUp(NameEmailData(userName = nickname!!, email = email!!)).enqueue(object : Callback<String> {
+                            override fun onResponse(
+                                call: Call<String>,
+                                response: retrofit2.Response<String>
+                            ) {
+                                if (response.isSuccessful) {
+                                    val data = JSONObject(JSONObject(response.body().toString()).getString("result"))
+                                    val userdata = UserData(
+                                        userId = data.getString("userId").toInt(),
+                                        userName = data.getString("userName"),
+                                        email = data.getString("email"),
+                                        holdingDollar = data.getString("holdingDollar").toFloat()
+                                    )
+
+                                    if (data != null) {
+                                        //데이터가 잘 왔는지 로그 찍어보기
+                                        Log.d("test_retrofit", "받은 정보 :" + data)
+
+                                        userid = userdata.userId
+                                        holdingDollars = userdata.holdingDollar
+
+                                        /**페이지 넘기기**/
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        startActivity(context, intent, null)
+                                    } else {
+                                        //정보를 받지 못했을 때 로그 찍기
+                                        Log.w("retrofit", "실패 ${response.code()}")
+                                    }
+                                }
+                            }
+
+                            override fun onFailure(call: Call<String>, t: Throwable) {
+                                Log.w("retrofit", "정보 접근 실패", t)
+                                Log.w("retrofit", "정보 접근 실패 response")
+                            }
+                        })                    }
                 }
             }
         }
@@ -181,23 +271,65 @@ fun kakaoLogin(
 fun naverLogin(
     context: Context
 ) {
-    var naverToken :String? = ""
+    var naverToken: String? = ""
 
     val profileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(response: NidProfileResponse) {
-            val userId = response.profile?.id
             val userEmail = response.profile?.email.toString()
-            val userNickname = response.profile?.nickname.toString()
-            Log.d("login", "id: ${userId} \ntoken: ${naverToken}")
-
+            val userNickname = response.profile?.nickname
+            Log.d("login", "email: ${userEmail}, nickName: ${userNickname}, \ntoken: ${naverToken}")
+            if (userNickname == null) {
+                nickname = userEmail
+            } else {
+                nickname = userNickname
+            }
             email = userEmail
-            nickname = userNickname
+
+            /********************서버 연결***********************/
+            authService.signUp(NameEmailData(userName = nickname!!, email = email!!)).enqueue(object : Callback<String> {
+                override fun onResponse(
+                    call: Call<String>,
+                    response: retrofit2.Response<String>
+                ) {
+                    if (response.isSuccessful) {
+                        val data = JSONObject(JSONObject(response.body().toString()).getString("result"))
+                        val userdata = UserData(
+                            userId = data.getString("userId").toInt(),
+                            userName = data.getString("userName"),
+                            email = data.getString("email"),
+                            holdingDollar = data.getString("holdingDollar").toFloat()
+                        )
+
+                        if (data != null) {
+                            //데이터가 잘 왔는지 로그 찍어보기
+                            Log.d("test_retrofit", "받은 정보 :" + data)
+
+                            userid = userdata.userId
+                            holdingDollars = userdata.holdingDollar
+
+                            /**페이지 넘기기**/
+                            val intent = Intent(context, MainActivity::class.java)
+                            startActivity(context, intent, null)
+                        } else {
+                            //정보를 받지 못했을 때 로그 찍기
+                            Log.w("retrofit", "실패 ${response.code()}")
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.w("retrofit", "정보 접근 실패", t)
+                    Log.w("retrofit", "정보 접근 실패 response")
+                }
+            })
         }
+
         override fun onFailure(httpStatus: Int, message: String) {
             val errorCode = NaverIdLoginSDK.getLastErrorCode().code
             val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
             Log.d("naverLogin", "errorCode : ${errorCode}, errorDescription : ${errorDescription}")
         }
+
         override fun onError(errorCode: Int, message: String) {
             onFailure(errorCode, message)
         }
@@ -215,15 +347,14 @@ fun naverLogin(
 
             //로그인 유저 정보 가져오기
             NidOAuthLogin().callProfileApi(profileCallback)
-
-            val intent = Intent(context, MainActivity::class.java)
-            startActivity(context, intent, null)
         }
+
         override fun onFailure(httpStatus: Int, message: String) {
             val errorCode = NaverIdLoginSDK.getLastErrorCode().code
             val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
             Log.d("naverLogin", "errorCode : ${errorCode}, errorDescription : ${errorDescription}")
         }
+
         override fun onError(errorCode: Int, message: String) {
             onFailure(errorCode, message)
         }

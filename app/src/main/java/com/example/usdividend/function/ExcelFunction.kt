@@ -1,7 +1,7 @@
 package com.example.usdividend.function
 
 import android.content.Context
-import com.example.usdividend.screen.DividendHistoryList
+import com.example.usdividend.dividendList
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
@@ -23,11 +23,11 @@ fun excel(
     headerRow.createCell(2, CellType.NUMERIC).setCellValue("Price")
 
     var rowIndex = 1
-    for (myData in DividendHistoryList) {
+    for (myData in dividendList) {
         val dataRow = sheet.createRow(rowIndex++)
-        dataRow.createCell(0).setCellValue(myData.month)
-        dataRow.createCell(1).setCellValue(myData.company)
-        dataRow.createCell(2).setCellValue(myData.price)
+        dataRow.createCell(0).setCellValue(myData.createdMonth.toString())
+        dataRow.createCell(1).setCellValue(myData.stockName)
+        dataRow.createCell(2).setCellValue(myData.dividend.toString())
     }
 
     val file = File(context.getExternalFilesDir(null), "my_dividend.xlsx")

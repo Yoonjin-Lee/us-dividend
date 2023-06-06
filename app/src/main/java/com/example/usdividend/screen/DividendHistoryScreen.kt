@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,27 +20,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.usdividend.R
 import com.example.usdividend.data.DividendHistoryData
+import com.example.usdividend.data.DividendListData
+import com.example.usdividend.dividendList
 import com.example.usdividend.function.excel
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 
-
-val DividendHistoryList = ArrayList<DividendHistoryData>()
 
 @Composable
 fun DividendHistoryScreen(
     context: Context
 ) {
     val currentContext = LocalContext.current
-
-    var listAdd by remember {
-        mutableStateOf(true)
-    }
-
-    if (listAdd) {
-        DividendHistoryList.add(DividendHistoryData("3", "Apple", "1.09"))
-        listAdd = false
-    }
 
     Scaffold(
         topBar = {
@@ -72,7 +64,7 @@ fun DividendHistoryScreen(
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                HistoryList(DividendHistoryList)
+                HistoryList(dividendList)
             }
         }
     )
@@ -119,7 +111,7 @@ fun DropDownPart(
 
 @Composable
 fun HistoryList(
-    list: ArrayList<DividendHistoryData>
+    list: SnapshotStateList<DividendListData>
 ) {
     LazyColumn() {
         items(list) {
@@ -131,14 +123,14 @@ fun HistoryList(
 
 @Composable
 fun HistoryCard(
-    it: DividendHistoryData
+    it: DividendListData
 ) {
     Row(
         modifier = Modifier
             .padding(23.dp, 21.dp)
     ) {
         Text(
-            text = it.month,
+            text = it.createdMonth.toString(),
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
@@ -154,7 +146,7 @@ fun HistoryCard(
             )
         )
         Text(
-            text = it.company,
+            text = it.stockName,
             modifier = Modifier.padding(14.dp, 0.dp),
             style = TextStyle(
                 fontSize = 18.sp,
@@ -164,7 +156,7 @@ fun HistoryCard(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "$${it.price}",
+            text = "$${it.dividend}",
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,

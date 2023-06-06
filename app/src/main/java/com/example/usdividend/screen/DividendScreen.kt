@@ -2,6 +2,7 @@ package com.example.usdividend
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +32,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.usdividend.activity.DividendHistoryActivity
+import com.example.usdividend.activity.holdingDollars
+import com.example.usdividend.activity.userid
+import com.example.usdividend.data.DividendListData
+import com.example.usdividend.data.StockIdData
+import com.example.usdividend.data.StockListCard
 import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
@@ -42,28 +47,16 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun DividendScreen(
     context: Context,
     sharedViewModel: SharedViewModel = viewModel()
 ) {
-    var companyList = remember {
-        mutableStateListOf<String>()
-    }
-
-    var companyAdd by remember {
-        mutableStateOf(true)
-    }
-
-    if (companyAdd) {
-        companyList.apply {
-            add("AT&T")
-            add("APPLE")
-            add("O")
-        }
-        companyAdd = false
-    }
 
     // dialog 에서 변경된 값을 가지고 리스트 요소 삭제
     if (sharedViewModel.myVariable) {
@@ -71,21 +64,77 @@ fun DividendScreen(
         sharedViewModel.myVariable = false
     }
 
+    var getDividendHistory by remember {
+        mutableStateOf(true)
+    }
+
+    /************배당 목록 가져오기************/
+    if (getDividendHistory){
+        authService.getDividendHistory(userId = userid!!).enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.isSuccessful) {
+                    val data = JSONObject(response.body().toString()).getJSONArray("result")
+
+                    if (data != null) {
+                        //데이터가 잘 왔는지 로그 찍어보기
+                        Log.d("retrofit", "배당 목록 가져오기")
+                        Log.d("test_retrofit", "받은 정보 :" + data)
+
+                        val list = ArrayList<JSONObject>()
+
+                        for (i in 0 until data.length()) {
+                            list.add(
+                                data.getJSONObject(i)
+                            )
+                        }
+
+                        for (i in list) {
+                            //배당 리스트에 등록
+                            dividendList.add(
+                                DividendListData(
+                                    stockName = i.getString("stockName"),
+                                    dividend = i.getString("dividend").toFloat(),
+                                    createdMonth = i.getString("createdAt").toString()
+                                        .split("-")[1].toInt()
+                                )
+                            )
+                            Log.d("retrofit", "dividendList : ${dividendList}")
+                        }
+                    } else {
+                        //정보를 받지 못했을 때 로그 찍기
+                        Log.d("retrofit", "배당 목록 가져오기")
+                        Log.w("retrofit", "실패 ${response.code()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d("retrofit", "배당 목록 가져오기")
+                Log.w("retrofit", "실패", t)
+            }
+        })
+        getDividendHistory = false
+    }
+
     // BarChart data
     val entries: ArrayList<BarEntry> = ArrayList()
+    val monthDividend : Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+    for(i: Int in 0 until  dividendList.size){
+        monthDividend[dividendList[i].createdMonth - 1] += dividendList[i].dividend
+    }
     entries.apply {
-        entries.add(BarEntry(1f, 10f))
-        entries.add(BarEntry(2f, 20f))
-        entries.add(BarEntry(3f, 30f))
-        entries.add(BarEntry(4f, 40f))
-        entries.add(BarEntry(5f, 50f))
-        entries.add(BarEntry(6f, 50f))
-        entries.add(BarEntry(7f, 50f))
-        entries.add(BarEntry(8f, 50f))
-        entries.add(BarEntry(9f, 50f))
-        entries.add(BarEntry(10f, 50f))
-        entries.add(BarEntry(11f, 50f))
-        entries.add(BarEntry(12f, 50f))
+        entries.add(BarEntry(1f, monthDividend[0]))
+        entries.add(BarEntry(2f, monthDividend[1]))
+        entries.add(BarEntry(3f, monthDividend[2]))
+        entries.add(BarEntry(4f, monthDividend[3]))
+        entries.add(BarEntry(5f, monthDividend[4]))
+        entries.add(BarEntry(6f, monthDividend[5]))
+        entries.add(BarEntry(7f, monthDividend[6]))
+        entries.add(BarEntry(8f, monthDividend[7]))
+        entries.add(BarEntry(9f, monthDividend[8]))
+        entries.add(BarEntry(10f, monthDividend[9]))
+        entries.add(BarEntry(11f, monthDividend[10]))
+        entries.add(BarEntry(12f, monthDividend[11]))
     }
 
     Column(
@@ -140,7 +189,7 @@ fun DollarPart() {
                 )
             )
             Text(
-                text = "50",
+                text = holdingDollars.toString(),
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
