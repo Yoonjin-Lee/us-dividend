@@ -1,16 +1,10 @@
 package com.example.usdividend.screen
 
-import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -33,17 +27,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat.*
-import androidx.core.content.ContextCompat.startActivity
-import com.example.usdividend.MainActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
-import com.example.usdividend.StockInputActivity
+import com.example.usdividend.SharedViewModel
+import com.example.usdividend.activity.userid
+import com.example.usdividend.authService
+import com.example.usdividend.data.ServerPostStock
 import com.example.usdividend.data.StockListCard
+import com.example.usdividend.server.ApiService
+import com.example.usdividend.server.getRetrofit
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun StockInputScreen(
@@ -68,18 +69,51 @@ fun StockInputScreen(
         bottomBar = { // 확인 버튼
             TextButton(
                 onClick = {
-                    mystockRegister!!.register(
-                        StockListCard(
-                            company = Name,
-                            quantity = Quantitiy,
-                            price = Price,
-                            dividend = Dividend,
-                            exchange = Exchange
+                    /**********서버 연결************/
+                    authService.postStock(
+                        ServerPostStock(
+                            userId = userid!!,
+                            stockName = Name,
+                            price = Price.toFloat(),
+                            exchangeRate = Exchange.toFloat(),
+                            quantity = Quantitiy.toInt()
                         )
-                    )
-                    Log.d("value", "${Name} ${Quantitiy}")
-                    Log.d("register", "완료")
-                    cur.findActivity().finish()
+                    ).enqueue(object : Callback<String> {
+                        override fun onResponse(call: Call<String>, response: Response<String>) {
+                            if (response.isSuccessful) {
+                                val data = response.body()
+
+                                if (data != null) {
+                                    //데이터가 잘 왔는지 로그 찍어보기
+                                    Log.d("retrofit", "보유 주식 등록하기")
+                                    Log.d("test_retrofit", "받은 정보 :" + data)
+
+                                    mystockRegister!!.register(
+                                        StockListCard(
+                                            company = Name,
+                                            quantity = Quantitiy,
+                                            price = Price,
+                                            exchange = Exchange
+                                        )
+                                    )
+                                    Log.d("value", "${Name} ${Quantitiy}")
+                                    Log.d("register", "완료")
+
+                                    cur.findActivity().finish()
+
+                                } else {
+                                    //정보를 받지 못했을 때 로그 찍기
+                                    Log.d("retrofit", "보유 주식 등록하기")
+                                    Log.w("retrofit", "실패 데이터 없음 ${response.code()}")
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<String>, t: Throwable) {
+                            Log.d("retrofit", "보유 주식 등록하기")
+                            Log.w("retrofit", "정보 접근 실패", t)
+                        }
+                    })
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,7 +140,7 @@ fun StockInputScreen(
 var Name : String = ""
 var Price : String = ""
 var Quantitiy : String = ""
-var Dividend : String = ""
+//var Dividend : String = ""
 var Exchange : String = ""
 
 @Composable
@@ -121,9 +155,9 @@ fun StockInputContent(
     var quantity by remember {
         mutableStateOf("")
     }
-    var dividend by remember {
-        mutableStateOf("")
-    }
+//    var dividend by remember {
+//        mutableStateOf("")
+//    }
     var exchange by remember {
         mutableStateOf("")
     }
@@ -131,7 +165,7 @@ fun StockInputContent(
     Name = name
     Price = price
     Quantitiy = quantity
-    Dividend = dividend
+//    Dividend = dividend
     Exchange = exchange
 
     Column(
@@ -284,55 +318,55 @@ fun StockInputContent(
                 )
             }
         }
-        Box(
-            modifier = Modifier.padding(0.dp, 20.5.dp, 0.dp, 6.5.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.stock_dividend),
-                    color = Color.Black,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                BasicTextField(
-                    value = dividend,
-                    textStyle = TextStyle(
-                        fontSize = 15.sp
-                    ),
-                    onValueChange = { dividend = it },
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .border(
-                                    1.dp, Gray,
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .fillMaxWidth()
-                                .height(47.dp),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            if (dividend.isEmpty()) {
-                                Text(
-                                    text = stringResource(id = R.string.stock_price_info),
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    color = Color.LightGray,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-            }
-        }
+//        Box(
+//            modifier = Modifier.padding(0.dp, 20.5.dp, 0.dp, 6.5.dp),
+//            contentAlignment = Alignment.CenterStart
+//        ) {
+//            Column {
+//                Text(
+//                    text = stringResource(id = R.string.stock_dividend),
+//                    color = Color.Black,
+//                    style = TextStyle(
+//                        fontSize = 15.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                )
+//                BasicTextField(
+//                    value = dividend,
+//                    textStyle = TextStyle(
+//                        fontSize = 15.sp
+//                    ),
+//                    onValueChange = { dividend = it },
+//                    maxLines = 1,
+//                    keyboardOptions = KeyboardOptions(
+//                        keyboardType = KeyboardType.Number
+//                    ),
+//                    decorationBox = { innerTextField ->
+//                        Box(
+//                            modifier = Modifier
+//                                .border(
+//                                    1.dp, Gray,
+//                                    RoundedCornerShape(12.dp)
+//                                )
+//                                .fillMaxWidth()
+//                                .height(47.dp),
+//                            contentAlignment = Alignment.CenterStart
+//                        ) {
+//                            if (dividend.isEmpty()) {
+//                                Text(
+//                                    text = stringResource(id = R.string.stock_price_info),
+//                                    fontSize = 15.sp,
+//                                    fontWeight = FontWeight.Normal,
+//                                    color = Color.LightGray,
+//                                    textAlign = TextAlign.Center
+//                                )
+//                            }
+//                            innerTextField()
+//                        }
+//                    }
+//                )
+//            }
+//        }
         Box(
             modifier = Modifier.padding(0.dp, 20.5.dp, 0.dp, 6.5.dp),
             contentAlignment = Alignment.CenterStart

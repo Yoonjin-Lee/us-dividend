@@ -1,5 +1,6 @@
 package com.example.usdividend
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -16,6 +17,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.usdividend.activity.email
+import com.example.usdividend.activity.nickname
 import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.screen.LogoutDialog
 import com.example.usdividend.ui.theme.Gray
@@ -24,6 +27,7 @@ import com.example.usdividend.ui.theme.Red
 
 @Composable
 fun SettingScreen(
+    context : Context
 ) {
     Column {
         Spacer(
@@ -33,7 +37,7 @@ fun SettingScreen(
                 .background(Color.White)
         )
         SettingTop()
-        SettingAccount()
+        SettingAccount(context = context)
     }
 }
 
@@ -58,7 +62,9 @@ fun SettingTop() {
 }
 
 @Composable
-fun SettingAccount() {
+fun SettingAccount(
+    context: Context
+) {
     Column {
         Text(
             text = stringResource(id = R.string.account),
@@ -96,7 +102,7 @@ fun SettingAccount() {
         }
 
         if (isClicked) {
-            LogoutDialog(v = true)
+            LogoutDialog(v = true, context = context)
         }
 
         TextButton(onClick = {

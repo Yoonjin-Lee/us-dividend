@@ -1,17 +1,8 @@
 package com.example.usdividend.screen
 
-import android.app.Activity.RESULT_OK
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,9 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +28,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
-import com.example.usdividend.MainActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.usdividend.*
 import com.example.usdividend.R
-import com.example.usdividend.StockInputActivity
+import com.example.usdividend.activity.StockInputActivity
+import com.example.usdividend.activity.holdingDollars
+import com.example.usdividend.activity.userid
+import com.example.usdividend.data.ServerDividendData
+import com.example.usdividend.data.StockIdData
 import com.example.usdividend.data.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun StockScreen(
@@ -55,14 +52,75 @@ fun StockScreen(
         mutableStateListOf<StockListCard>()
     }
 
-//    stockList.add(
-//        StockListCard(
-//            "Apple", "3", "1.2", "1300", "130"
-//        )
-//    )
+    var getStockList by remember {
+        mutableStateOf(true)
+    }
+
+    if (getStockList) {
+        authService.getStockList(userid!!).enqueue(object : Callback<String> {
+            override fun onResponse(
+                call: Call<String>,
+                response: Response<String>
+            ) {
+                if (response.isSuccessful) {
+                    val data = JSONObject(response.body().toString()).getJSONArray("result")
+
+                    if (data != null) {
+                        //데이터가 잘 왔는지 로그 찍어보기
+                        Log.d("retrofit", "유저 id로 보유주식 얻기")
+                        Log.d("test_retrofit", "받은 정보 :" + data)
+
+                        val list = ArrayList<JSONObject>()
+
+                        for (i in 0 until data.length()) {
+                            list.add(
+                                data.getJSONObject(i)
+                            )
+                        }
+
+                        for (i in list) {
+                            //주식 리스트에 등록
+                            stockList.add(
+                                StockListCard(
+                                    company = i.getString("stockName"),
+                                    quantity = i.getString("quantity"),
+                                    exchange = i.getString("exchangeRate"),
+                                    price = i.getString("price")
+                                )
+                            )
+                            //회사 리스트에 등록
+                            companyList.add(i.getString("stockName"))
+                            Log.d("retrofit", "companyList : ${companyList}")
+                            //주식 아이디 리스트에 등록
+                            stockIdList.add(
+                                StockIdData(
+                                    holdingId = i.getString("holdingId").toInt(),
+                                    stockName = i.getString("stockName"),
+                                    stockId = i.getString("stockId").toInt(),
+                                    quantity = i.getString("quantity").toInt()
+                                )
+                            )
+                            Log.d("retrofit", "stockIdList : ${stockIdList}")
+                        }
+                    } else {
+                        //정보를 받지 못했을 때 로그 찍기
+                        Log.d("retrofit", "유저 id로 보유주식 얻기")
+                        Log.w("retrofit", "실패 ${response.code()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d("retrofit", "유저 id로 보유주식 얻기")
+                Log.w("retrofit", "정보 접근 실패", t)
+            }
+        })
+        getStockList = false
+    }
+
     val intent = Intent(context, StockInputActivity::class.java)
 
-    val register = object : OnStockRegister{
+    val register = object : OnStockRegister {
         override fun register(stockListCard: StockListCard) {
             stockList.add(stockListCard)
             Log.d("stockList", "완료")
@@ -130,7 +188,7 @@ fun StockScreen(
                 )
                 Spacer(modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp))
                 Text(
-                    text = "00",
+                    text = holdingDollars.toString(),
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
@@ -234,13 +292,13 @@ fun StockListDump(stockListCard: StockListCard) {
                         fontWeight = FontWeight.Medium
                     )
                 )
-                Text(
-                    text = stringResource(id = R.string.dividend) + "${stockListCard.dividend}",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                )
+//                Text(
+//                    text = stringResource(id = R.string.dividend) + "${stockListCard.dividend}",
+//                    style = TextStyle(
+//                        fontSize = 12.sp,
+//                        fontWeight = FontWeight.Medium
+//                    )
+//                )
                 Text(
                     text = stringResource(id = R.string.exchange) + "${stockListCard.exchange}",
                     style = TextStyle(
@@ -270,5 +328,5 @@ fun PreviewStockScreen() {
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewStockList() {
-    StockListDump(StockListCard("Apple", "3", "2.1", "1300", "130"))
+    StockListDump(StockListCard("Apple", "3", "1300", "130"))
 }

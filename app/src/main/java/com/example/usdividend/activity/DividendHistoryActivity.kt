@@ -1,4 +1,4 @@
-package com.example.usdividend
+package com.example.usdividend.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
