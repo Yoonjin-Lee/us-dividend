@@ -6,3 +6,4 @@ data class StockIdData(
     val stockId : Int,
     val quantity : Int
 )
+

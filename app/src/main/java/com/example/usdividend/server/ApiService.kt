@@ -61,4 +61,14 @@ interface ApiService {
     fun getDividendHistory(
         @Path("userId") userId : Int
     ):Call<String>
+
+    //보유 달러 받기
+    @GET("/users/{userid}")
+    fun getDollars(
+        @Path("userid") userid: Int
+    ):Call<String>
+
+    //환율 받기
+    @GET("/users/exchange-rate")
+    fun getExchange():Call<String>
 }
