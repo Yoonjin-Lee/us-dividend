@@ -1,4 +1,4 @@
-![header](https://capsule-render.vercel.app/api?type=waving&color=FAC0FF&height=250&section=header&text=미주정복&fontSize=90&fontColor=#0070C0)
+![header](https://capsule-render.vercel.app/api?type=waving&color=FAC0FF&height=250&section=header&text=미주정복&fontSize=90&fontColor=0070C0)
 
 종합설계1   
 : 주식 배당금을 시각적으로 정리하여 보여주고, 주식을 관리할 수 있게 해주는 애플리케이션  
