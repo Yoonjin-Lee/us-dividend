@@ -33,12 +33,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
 import com.example.usdividend.activity.MainActivity
+import com.example.usdividend.activity.holdingDollars
 import com.example.usdividend.activity.userid
 import com.example.usdividend.authService
 import com.example.usdividend.data.ServerPostDividend
 import com.example.usdividend.stockIdList
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -166,7 +168,26 @@ fun DividendDialog(
                                 })
 
                                 /**********보유 달러 변경***********/
+                                authService.getDollars(userid!!).enqueue(object : Callback<String>{
+                                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                                        if (response.isSuccessful){
+                                            val data = JSONObject(response.body().toString()).getString("result")
 
+                                            if (data!=null){
+                                                sharedViewModel.dollars = data.toFloat()
+                                                holdingDollars = data.toFloat()
+                                                Log.d("retrofit", "보유 달러 데이터 : ${data}")
+                                            } else {
+                                                Log.d("retrofit", "보유 달러 데이터 없음")
+                                            }
+                                        }
+                                    }
+
+                                    override fun onFailure(call: Call<String>, t: Throwable) {
+                                        Log.d("retrofit", "보유 달러 업데이트")
+                                        Log.w("retrofit", "정보 접근 실패", t)
+                                    }
+                                })
 
                             },
                             modifier = Modifier

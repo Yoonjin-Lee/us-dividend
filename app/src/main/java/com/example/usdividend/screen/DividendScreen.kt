@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,8 +69,15 @@ fun DividendScreen(
         mutableStateOf(true)
     }
 
+    val cList = remember {
+        mutableStateListOf<String>()
+    }
+
     /************배당 목록 가져오기************/
-    if (getDividendHistory){
+    if (getDividendHistory) {
+        for (i in companyList){
+            cList.add(i)
+        }
         authService.getDividendHistory(userId = userid!!).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
@@ -118,8 +126,8 @@ fun DividendScreen(
 
     // BarChart data
     val entries: ArrayList<BarEntry> = ArrayList()
-    val monthDividend : Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-    for(i: Int in 0 until  dividendList.size){
+    val monthDividend: Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+    for (i: Int in 0 until dividendList.size) {
         monthDividend[dividendList[i].createdMonth - 1] += dividendList[i].dividend
     }
     entries.apply {
@@ -141,7 +149,7 @@ fun DividendScreen(
         verticalArrangement = Arrangement.Top
     ) {
         DollarPart()
-        MonthlyList(companyList)
+        MonthlyList(cList)
         DividedTitle(text = stringResource(id = R.string.table_title))
         BarChartView(data = entries)
         Row {
@@ -171,7 +179,9 @@ fun DividendScreen(
 }
 
 @Composable
-fun DollarPart() {
+fun DollarPart(
+    sharedViewModel: SharedViewModel = viewModel()
+) {
     Box(
         Modifier
             .background(Gray, RectangleShape)
@@ -189,7 +199,7 @@ fun DollarPart() {
                 )
             )
             Text(
-                text = holdingDollars.toString(),
+                text = sharedViewModel.dollars.toString(),
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -231,7 +241,7 @@ fun MonthlyList(
                 .padding(18.dp, 0.dp)
                 .height(80.dp)
         ) {
-            CompanyList(companyList = companyList)
+                CompanyList(companyList = companyList)
         }
     }
 }

@@ -7,3 +7,4 @@ data class ServerPostStock(
     val exchangeRate: Float,
     val quantity: Int
 )
+

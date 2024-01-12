@@ -37,6 +37,7 @@ import com.example.usdividend.activity.userid
 import com.example.usdividend.data.ServerDividendData
 import com.example.usdividend.data.StockIdData
 import com.example.usdividend.data.StockListCard
+import com.example.usdividend.data.UserData
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import org.json.JSONObject
@@ -46,7 +47,8 @@ import retrofit2.Response
 
 @Composable
 fun StockScreen(
-    context: Context
+    context: Context,
+    sharedViewModel: SharedViewModel = viewModel()
 ) {
     var stockList = remember {
         mutableStateListOf<StockListCard>()
@@ -57,6 +59,9 @@ fun StockScreen(
     }
 
     if (getStockList) {
+        //로그인 시 받은 보유 달러 저장
+        sharedViewModel.dollars = holdingDollars!!.toFloat()
+
         authService.getStockList(userid!!).enqueue(object : Callback<String> {
             override fun onResponse(
                 call: Call<String>,
@@ -139,6 +144,9 @@ fun StockScreen(
                 .background(colorResource(id = R.color.gray), RectangleShape)
                 .fillMaxWidth()
         ) {
+            var exchangeData by remember {
+                mutableStateOf("0000")
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(18.dp, 23.dp)
@@ -153,7 +161,7 @@ fun StockScreen(
                 )
                 Spacer(modifier = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp))
                 Text(
-                    text = "0000",
+                    text = exchangeData,
                     style = TextStyle(
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp,
@@ -168,7 +176,31 @@ fun StockScreen(
                         fontWeight = FontWeight.Medium
                     )
                 )
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    authService.getExchange().enqueue(object : Callback<String> {
+                        override fun onResponse(call: Call<String>, response: Response<String>) {
+                            if (response.isSuccessful) {
+                                val data = JSONObject(
+                                    response.body().toString()
+                                ).getString("result")
+
+                                if (data != null) {
+                                    //데이터가 잘 왔는지 로그 찍어보기
+                                    Log.d("test_retrofit", "받은 정보 :" + data)
+                                    exchangeData = data
+                                } else {
+                                    //정보를 받지 못했을 때 로그 찍기
+                                    Log.w("retrofit", "환율 실패 ${response.code()}")
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<String>, t: Throwable) {
+                            Log.w("retrofit", "환율 접근 실패", t)
+                            Log.w("retrofit", "환율 접근 실패 response")
+                        }
+                    })
+                }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
                         contentDescription = stringResource(id = R.string.reset)
@@ -292,13 +324,6 @@ fun StockListDump(stockListCard: StockListCard) {
                         fontWeight = FontWeight.Medium
                     )
                 )
-//                Text(
-//                    text = stringResource(id = R.string.dividend) + "${stockListCard.dividend}",
-//                    style = TextStyle(
-//                        fontSize = 12.sp,
-//                        fontWeight = FontWeight.Medium
-//                    )
-//                )
                 Text(
                     text = stringResource(id = R.string.exchange) + "${stockListCard.exchange}",
                     style = TextStyle(
