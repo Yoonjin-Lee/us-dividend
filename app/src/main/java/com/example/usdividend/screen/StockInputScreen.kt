@@ -102,8 +102,6 @@ fun StockInputScreen(
                                     Log.d("value", "${Name} ${Quantitiy}")
                                     Log.d("register", "완료")
 
-                                    cur.findActivity().finish()
-
                                 } else {
                                     //정보를 받지 못했을 때 로그 찍기
                                     Log.d("retrofit", "보유 주식 등록하기")
@@ -128,6 +126,8 @@ fun StockInputScreen(
                                     sharedViewModel.dollars = data.toFloat()
                                     holdingDollars = data.toFloat()
                                     Log.d("retrofit", "보유 달러 데이터 : ${data}")
+
+                                    cur.findActivity().finish()
                                 } else {
                                     Log.d("retrofit", "보유 달러 데이터 없음")
                                 }
@@ -343,55 +343,6 @@ fun StockInputContent(
                 )
             }
         }
-//        Box(
-//            modifier = Modifier.padding(0.dp, 20.5.dp, 0.dp, 6.5.dp),
-//            contentAlignment = Alignment.CenterStart
-//        ) {
-//            Column {
-//                Text(
-//                    text = stringResource(id = R.string.stock_dividend),
-//                    color = Color.Black,
-//                    style = TextStyle(
-//                        fontSize = 15.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                )
-//                BasicTextField(
-//                    value = dividend,
-//                    textStyle = TextStyle(
-//                        fontSize = 15.sp
-//                    ),
-//                    onValueChange = { dividend = it },
-//                    maxLines = 1,
-//                    keyboardOptions = KeyboardOptions(
-//                        keyboardType = KeyboardType.Number
-//                    ),
-//                    decorationBox = { innerTextField ->
-//                        Box(
-//                            modifier = Modifier
-//                                .border(
-//                                    1.dp, Gray,
-//                                    RoundedCornerShape(12.dp)
-//                                )
-//                                .fillMaxWidth()
-//                                .height(47.dp),
-//                            contentAlignment = Alignment.CenterStart
-//                        ) {
-//                            if (dividend.isEmpty()) {
-//                                Text(
-//                                    text = stringResource(id = R.string.stock_price_info),
-//                                    fontSize = 15.sp,
-//                                    fontWeight = FontWeight.Normal,
-//                                    color = Color.LightGray,
-//                                    textAlign = TextAlign.Center
-//                                )
-//                            }
-//                            innerTextField()
-//                        }
-//                    }
-//                )
-//            }
-//        }
         Box(
             modifier = Modifier.padding(0.dp, 20.5.dp, 0.dp, 6.5.dp),
             contentAlignment = Alignment.CenterStart
