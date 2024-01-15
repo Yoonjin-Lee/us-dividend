@@ -1,9 +1,9 @@
 package com.example.usdividend.di
 
 import com.example.usdividend.data.*
-import com.example.usdividend.data.type.NameEmailData
-import com.example.usdividend.data.type.ServerPostDividend
-import com.example.usdividend.data.type.ServerPostStock
+import com.example.usdividend.data.type.server.ServerNameEmailData
+import com.example.usdividend.data.type.server.ServerPostDividend
+import com.example.usdividend.data.type.server.ServerPostStock
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,7 +16,7 @@ interface ApiService {
     //로그인
     @POST("/users/login")
     suspend fun signUp(
-        @Body nameEmailData: NameEmailData
+        @Body serverNameEmailData: ServerNameEmailData
     ): Response<String>
 
     //로그아웃

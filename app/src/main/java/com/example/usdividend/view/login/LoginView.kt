@@ -47,7 +47,7 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel()) {
         )
         IconButton(
             onClick = {
-                viewModel.naverLogin()
+                viewModel.kakaoLogin()
             },
             modifier = Modifier
                 .padding(0.dp, 70.dp, 0.dp, 10.dp)
@@ -62,7 +62,7 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel()) {
         }
         IconButton(
             onClick = {
-                viewModel.kakaoLogin()
+                viewModel.naverLogin()
             },
             modifier = Modifier
                 .padding(0.dp, 0.dp, 0.dp, 10.dp)

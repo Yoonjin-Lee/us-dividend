@@ -1,4 +1,4 @@
-package com.example.usdividend.data.type
+package com.example.usdividend.data.type.server
 
 data class ServerPostDividend (
     val holdingId : Int,

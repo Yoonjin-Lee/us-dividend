@@ -172,29 +172,29 @@ fun StockScreen(
                     )
                 )
                 IconButton(onClick = {
-                    authService.getExchange().enqueue(object : Callback<String> {
-                        override fun onResponse(call: Call<String>, response: Response<String>) {
-                            if (response.isSuccessful) {
-                                val data = JSONObject(
-                                    response.body().toString()
-                                ).getString("result")
-
-                                if (data != null) {
-                                    //데이터가 잘 왔는지 로그 찍어보기
-                                    Log.d("test_retrofit", "받은 정보 :" + data)
-                                    exchangeData = data
-                                } else {
-                                    //정보를 받지 못했을 때 로그 찍기
-                                    Log.w("retrofit", "환율 실패 ${response.code()}")
-                                }
-                            }
-                        }
-
-                        override fun onFailure(call: Call<String>, t: Throwable) {
-                            Log.w("retrofit", "환율 접근 실패", t)
-                            Log.w("retrofit", "환율 접근 실패 response")
-                        }
-                    })
+//                    authService.getExchange().enqueue(object : Callback<String> {
+//                        override fun onResponse(call: Call<String>, response: Response<String>) {
+//                            if (response.isSuccessful) {
+//                                val data = JSONObject(
+//                                    response.body().toString()
+//                                ).getString("result")
+//
+//                                if (data != null) {
+//                                    //데이터가 잘 왔는지 로그 찍어보기
+//                                    Log.d("test_retrofit", "받은 정보 :" + data)
+//                                    exchangeData = data
+//                                } else {
+//                                    //정보를 받지 못했을 때 로그 찍기
+//                                    Log.w("retrofit", "환율 실패 ${response.code()}")
+//                                }
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<String>, t: Throwable) {
+//                            Log.w("retrofit", "환율 접근 실패", t)
+//                            Log.w("retrofit", "환율 접근 실패 response")
+//                        }
+//                    })
                 }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),

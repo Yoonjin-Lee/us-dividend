@@ -33,7 +33,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
 import com.example.usdividend.view.login.LoginActivity
-import com.example.usdividend.authService
 import com.example.usdividend.ui.theme.Red
 import retrofit2.Call
 import retrofit2.Callback

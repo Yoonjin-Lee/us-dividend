@@ -5,12 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.usdividend.activity.MainActivity
+import com.example.usdividend.data.local.AppDatabase
+import com.example.usdividend.data.local.dao.UserDao
 import com.example.usdividend.data.repository.LoginRepository
-import com.example.usdividend.data.type.NameEmailData
+import com.example.usdividend.data.repository.UserRepository
+import com.example.usdividend.data.type.server.ServerNameEmailData
 import com.example.usdividend.data.type.UserData
+import com.example.usdividend.di.Application
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -23,22 +28,23 @@ import com.navercorp.nid.profile.data.NidProfileResponse
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
-@AndroidEntryPoint
 class LoginViewModel @Inject constructor(
-    @ActivityContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val userRepository: UserRepository
 ) : ViewModel() {
-    @Inject
-    lateinit var loginRepository: LoginRepository
+    @Inject lateinit var loginRepository: LoginRepository
 
     var email: String? = null
     var nickname: String? = null
     var userid: Int? = null
-    var holdingDollars: Float? = null
 
     fun kakaoLogin(
     ) {
@@ -62,39 +68,71 @@ class LoginViewModel @Inject constructor(
                         email = user.kakaoAccount?.email
                         nickname = user.kakaoAccount?.profile?.nickname
 
-                        /********************서버 연결***********************/
-                        viewModelScope.launch {
-                            val serverAnswer = loginRepository.signUp(
-                                NameEmailData(nickname!!, email!!)
-                            )
-                            when (serverAnswer.isSuccessful) {
-                                true -> {
-                                    val data = JSONObject(
-                                        JSONObject(
-                                            serverAnswer.body().toString()
-                                        ).getString("result")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            // 저장된 내용이 없는 경우
+                            if (userRepository.countAll() < 1) {
+                                userRepository.insertAll(
+                                    UserData(
+                                        0,
+                                        nickname!!,
+                                        email!!,
+                                        "0".toFloat()
                                     )
-                                    val userdata = UserData(
-                                        userId = data.getString("userId").toInt(),
-                                        userName = data.getString("userName"),
-                                        email = data.getString("email"),
-                                        holdingDollar = data.getString("holdingDollar")
-                                            .toFloat()
-                                    )
-                                    userid = userdata.userId
-                                    holdingDollars = userdata.holdingDollar
-                                    val intent = Intent(
-                                        context,
-                                        MainActivity::class.java
-                                    )
-                                    startActivity(context, intent, null)
-                                }
-
-                                else -> {
-                                    Log.d("Retrofit", "data null")
-                                }
+                                )
+                            }
+                            // 저장된 내용이 다른 경
+                            else if (userRepository.findNameByEmail(email!!) != nickname) {
+                                UserData(
+                                    0,
+                                    nickname!!,
+                                    email!!,
+                                    "0".toFloat()
+                                )
                             }
                         }
+
+                        val intent = Intent(
+                            context,
+                            MainActivity::class.java
+                        )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(context, intent, null)
+
+                        /********************서버 연결***********************/
+//                        viewModelScope.launch {
+//                            val serverAnswer = loginRepository.signUp(
+//                                ServerNameEmailData(nickname!!, email!!)
+//                            )
+//                            when (serverAnswer.isSuccessful) {
+//                                true -> {
+//                                    val data = JSONObject(
+//                                        JSONObject(
+//                                            serverAnswer.body().toString()
+//                                        ).getString("result")
+//                                    )
+//                                    val userdata = UserData(
+//                                        userId = data.getString("userId").toInt(),
+//                                        userName = data.getString("userName"),
+//                                        email = data.getString("email"),
+//                                        holdingDollar = data.getString("holdingDollar")
+//                                            .toFloat()
+//                                    )
+//                                    if (appDatabase.userDao().countAll() > 0){
+//                                        appDatabase.userDao().deleteAll()
+//                                    }
+//                                    appDatabase.userDao().insertAll(userdata)
+//                                    val intent = Intent(
+//                                        context,
+//                                        MainActivity::class.java
+//                                    )
+//                                    startActivity(context, intent, null)
+//                                }
+//
+//                                else -> {
+//                                    Log.d("Retrofit", "data null")
+//                                }
+//                            }
+//                        }
                     }
                 }
             }
@@ -131,39 +169,71 @@ class LoginViewModel @Inject constructor(
                             email = user.kakaoAccount?.email
                             nickname = user.kakaoAccount?.profile?.nickname
 
-                            /********************서버 연결***********************/
-                            viewModelScope.launch {
-                                val serverAnswer = loginRepository.signUp(
-                                    NameEmailData(nickname!!, email!!)
-                                )
-                                when (serverAnswer.isSuccessful) {
-                                    true -> {
-                                        val data = JSONObject(
-                                            JSONObject(
-                                                serverAnswer.body().toString()
-                                            ).getString("result")
+                            CoroutineScope(Dispatchers.IO).launch {
+                                // 저장된 내용이 없는 경우
+                                if (userRepository.countAll() < 1) {
+                                    userRepository.insertAll(
+                                        UserData(
+                                            0,
+                                            nickname!!,
+                                            email!!,
+                                            "0".toFloat()
                                         )
-                                        val userdata = UserData(
-                                            userId = data.getString("userId").toInt(),
-                                            userName = data.getString("userName"),
-                                            email = data.getString("email"),
-                                            holdingDollar = data.getString("holdingDollar")
-                                                .toFloat()
-                                        )
-                                        userid = userdata.userId
-                                        holdingDollars = userdata.holdingDollar
-                                        val intent = Intent(
-                                            context,
-                                            MainActivity::class.java
-                                        )
-                                        startActivity(context, intent, null)
-                                    }
-
-                                    else -> {
-                                        Log.d("Retrofit", "data null")
-                                    }
+                                    )
+                                }
+                                // 저장된 내용이 다른 경우
+                                else if (userRepository.findNameByEmail(email!!) != nickname) {
+                                    UserData(
+                                        0,
+                                        nickname!!,
+                                        email!!,
+                                        "0".toFloat()
+                                    )
                                 }
                             }
+
+                            val intent = Intent(
+                                context,
+                                MainActivity::class.java
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(context, intent, null)
+
+                            /********************서버 연결***********************/
+//                            viewModelScope.launch {
+//                                val serverAnswer = loginRepository.signUp(
+//                                    ServerNameEmailData(nickname!!, email!!)
+//                                )
+//                                when (serverAnswer.isSuccessful) {
+//                                    true -> {
+//                                        val data = JSONObject(
+//                                            JSONObject(
+//                                                serverAnswer.body().toString()
+//                                            ).getString("result")
+//                                        )
+//                                        val userdata = UserData(
+//                                            userId = data.getString("userId").toInt(),
+//                                            userName = data.getString("userName"),
+//                                            email = data.getString("email"),
+//                                            holdingDollar = data.getString("holdingDollar")
+//                                                .toFloat()
+//                                        )
+//                                        if (appDatabase.userDao().countAll() > 0){
+//                                            appDatabase.userDao().deleteAll()
+//                                        }
+//                                        appDatabase.userDao().insertAll(userdata)
+//                                        val intent = Intent(
+//                                            context,
+//                                            MainActivity::class.java
+//                                        )
+//                                        startActivity(context, intent, null)
+//                                    }
+//
+//                                    else -> {
+//                                        Log.d("Retrofit", "data null")
+//                                    }
+//                                }
+//                            }
                         }
                     }
                 }
@@ -192,39 +262,71 @@ class LoginViewModel @Inject constructor(
                 }
                 email = userEmail
 
-                /********************서버 연결***********************/
-                viewModelScope.launch {
-                    val serverAnswer = loginRepository.signUp(
-                        NameEmailData(nickname!!, email!!)
-                    )
-                    when (serverAnswer.isSuccessful) {
-                        true -> {
-                            val data = JSONObject(
-                                JSONObject(
-                                    serverAnswer.body().toString()
-                                ).getString("result")
+                CoroutineScope(Dispatchers.IO).launch {
+                    // 저장된 내용이 없는 경우
+                    if (userRepository.countAll() < 1) {
+                        userRepository.insertAll(
+                            UserData(
+                                0,
+                                nickname!!,
+                                email!!,
+                                "0".toFloat()
                             )
-                            val userdata = UserData(
-                                userId = data.getString("userId").toInt(),
-                                userName = data.getString("userName"),
-                                email = data.getString("email"),
-                                holdingDollar = data.getString("holdingDollar")
-                                    .toFloat()
-                            )
-                            userid = userdata.userId
-                            holdingDollars = userdata.holdingDollar
-                            val intent = Intent(
-                                context,
-                                MainActivity::class.java
-                            )
-                            startActivity(context, intent, null)
-                        }
-
-                        else -> {
-                            Log.d("Retrofit", "data null")
-                        }
+                        )
+                    }
+                    // 저장된 내용이 다른 경우
+                    else if (userRepository.findNameByEmail(email!!) != nickname) {
+                        UserData(
+                            0,
+                            nickname!!,
+                            email!!,
+                            "0".toFloat()
+                        )
                     }
                 }
+
+                val intent = Intent(
+                    context,
+                    MainActivity::class.java
+                )
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(context, intent, null)
+
+                /********************서버 연결***********************/
+//                viewModelScope.launch {
+//                    val serverAnswer = loginRepository.signUp(
+//                        ServerNameEmailData(nickname!!, email!!)
+//                    )
+//                    when (serverAnswer.isSuccessful) {
+//                        true -> {
+//                            val data = JSONObject(
+//                                JSONObject(
+//                                    serverAnswer.body().toString()
+//                                ).getString("result")
+//                            )
+//                            val userdata = UserData(
+//                                userId = data.getString("userId").toInt(),
+//                                userName = data.getString("userName"),
+//                                email = data.getString("email"),
+//                                holdingDollar = data.getString("holdingDollar")
+//                                    .toFloat()
+//                            )
+//                            if (appDatabase.userDao().countAll() > 0){
+//                                appDatabase.userDao().deleteAll()
+//                            }
+//                            appDatabase.userDao().insertAll(userdata)
+//                            val intent = Intent(
+//                                context,
+//                                MainActivity::class.java
+//                            )
+//                            startActivity(context, intent, null)
+//                        }
+//
+//                        else -> {
+//                            Log.d("Retrofit", "data null")
+//                        }
+//                    }
+//                }
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
