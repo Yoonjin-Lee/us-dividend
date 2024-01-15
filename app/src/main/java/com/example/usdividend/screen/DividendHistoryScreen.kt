@@ -1,7 +1,6 @@
 package com.example.usdividend.screen
 
 import android.content.Context
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,8 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.usdividend.R
-import com.example.usdividend.data.DividendHistoryData
-import com.example.usdividend.data.DividendListData
+import com.example.usdividend.data.type.DividendListData
 import com.example.usdividend.dividendList
 import com.example.usdividend.function.excel
 import com.example.usdividend.ui.theme.Gray

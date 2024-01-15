@@ -17,9 +17,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.usdividend.activity.email
-import com.example.usdividend.activity.nickname
-import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.screen.LogoutDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
@@ -50,7 +47,7 @@ fun SettingTop() {
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
-            text = nickname!!,
+            text = "",
             modifier = Modifier.padding(12.dp, 20.dp),
             style = TextStyle(
                 fontSize = 20.sp,
@@ -82,7 +79,7 @@ fun SettingAccount(
                 .background(Gray)
         )
         Text(
-            text = email!!,
+            text = "",
             style = TextStyle(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Normal,
