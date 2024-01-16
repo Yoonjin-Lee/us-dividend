@@ -1,4 +1,4 @@
-package com.example.usdividend.screen
+package com.example.usdividend.view.stock
 
 import android.content.Context
 import android.content.Intent
@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -24,29 +25,22 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.usdividend.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.usdividend.R
-import com.example.usdividend.activity.StockInputActivity
 import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
-fun StockScreen(
-    context: Context,
-    sharedViewModel: SharedViewModel = viewModel()
+fun StockView(
+    viewModel: StockViewModel = hiltViewModel(),
+    context: Context
 ) {
-    var stockList = remember {
-        mutableStateListOf<StockListCard>()
+    val stockList = viewModel.stockList.observeAsState()
+    stockList.value?.let {
+        stockList.value = viewModel.getStockList()
     }
 
     var getStockList by remember {
@@ -55,79 +49,9 @@ fun StockScreen(
 
     if (getStockList) {
         //로그인 시 받은 보유 달러 저장
-//        sharedViewModel.dollars = holdingDollars!!.toFloat()
 
-//        authService.getStockList(userid!!).enqueue(object : Callback<String> {
-//            override fun onResponse(
-//                call: Call<String>,
-//                response: Response<String>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val data = JSONObject(response.body().toString()).getJSONArray("result")
-//
-//                    if (data != null) {
-//                        //데이터가 잘 왔는지 로그 찍어보기
-//                        Log.d("retrofit", "유저 id로 보유주식 얻기")
-//                        Log.d("test_retrofit", "받은 정보 :" + data)
-//
-//                        val list = ArrayList<JSONObject>()
-//
-//                        for (i in 0 until data.length()) {
-//                            list.add(
-//                                data.getJSONObject(i)
-//                            )
-//                        }
-//
-//                        for (i in list) {
-//                            //주식 리스트에 등록
-//                            stockList.add(
-//                                StockListCard(
-//                                    company = i.getString("stockName"),
-//                                    quantity = i.getString("quantity"),
-//                                    exchange = i.getString("exchangeRate"),
-//                                    price = i.getString("price")
-//                                )
-//                            )
-//                            //회사 리스트에 등록
-//                            companyList.add(i.getString("stockName"))
-//                            Log.d("retrofit", "companyList : ${companyList}")
-//                            //주식 아이디 리스트에 등록
-//                            stockIdList.add(
-//                                StockIdData(
-//                                    holdingId = i.getString("holdingId").toInt(),
-//                                    stockName = i.getString("stockName"),
-//                                    stockId = i.getString("stockId").toInt(),
-//                                    quantity = i.getString("quantity").toInt()
-//                                )
-//                            )
-//                            Log.d("retrofit", "stockIdList : ${stockIdList}")
-//                        }
-//                    } else {
-//                        //정보를 받지 못했을 때 로그 찍기
-//                        Log.d("retrofit", "유저 id로 보유주식 얻기")
-//                        Log.w("retrofit", "실패 ${response.code()}")
-//                    }
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<String>, t: Throwable) {
-//                Log.d("retrofit", "유저 id로 보유주식 얻기")
-//                Log.w("retrofit", "정보 접근 실패", t)
-//            }
-//        })
         getStockList = false
     }
-
-    val intent = Intent(context, StockInputActivity::class.java)
-
-    val register = object : OnStockRegister {
-        override fun register(stockListCard: StockListCard) {
-            stockList.add(stockListCard)
-            Log.d("stockList", "완료")
-            Log.d("stockList", "${stockList.size}")
-        }
-    }
-    setStockRegister(register)
 
     Column(
         modifier = Modifier
@@ -172,29 +96,6 @@ fun StockScreen(
                     )
                 )
                 IconButton(onClick = {
-//                    authService.getExchange().enqueue(object : Callback<String> {
-//                        override fun onResponse(call: Call<String>, response: Response<String>) {
-//                            if (response.isSuccessful) {
-//                                val data = JSONObject(
-//                                    response.body().toString()
-//                                ).getString("result")
-//
-//                                if (data != null) {
-//                                    //데이터가 잘 왔는지 로그 찍어보기
-//                                    Log.d("test_retrofit", "받은 정보 :" + data)
-//                                    exchangeData = data
-//                                } else {
-//                                    //정보를 받지 못했을 때 로그 찍기
-//                                    Log.w("retrofit", "환율 실패 ${response.code()}")
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: Call<String>, t: Throwable) {
-//                            Log.w("retrofit", "환율 접근 실패", t)
-//                            Log.w("retrofit", "환율 접근 실패 response")
-//                        }
-//                    })
                 }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
@@ -252,7 +153,7 @@ fun StockScreen(
                     Spacer(modifier = Modifier.weight(1f, true))
                     IconButton(
                         onClick = {
-                            startActivity(context, intent, null)
+                            viewModel.move()
                         }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_round_plus),
@@ -313,21 +214,21 @@ fun StockListDump(stockListCard: StockListCard) {
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = stringResource(id = R.string.quantity) + "${stockListCard.quantity}",
+                    text = stringResource(id = R.string.quantity) + "$stockListCard.quantity",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.exchange) + "${stockListCard.exchange}",
+                    text = stringResource(id = R.string.exchange) + "$stockListCard.exchange",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.price) + "${stockListCard.price}",
+                    text = stringResource(id = R.string.price) + "$stockListCard.price",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -336,17 +237,4 @@ fun StockListDump(stockListCard: StockListCard) {
             }
         }
     }
-}
-
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewStockScreen() {
-//    StockScreen(stockList = stockList)
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewStockList() {
-    StockListDump(StockListCard("Apple", "3", "1300", "130"))
 }

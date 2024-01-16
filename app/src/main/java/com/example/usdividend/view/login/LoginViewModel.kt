@@ -31,7 +31,8 @@ class LoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userDao: UserDao
 ) : ViewModel() {
-    @Inject lateinit var loginRepository: LoginRepository
+    @Inject
+    lateinit var loginRepository: LoginRepository
 
     var email: String? = null
     var nickname: String? = null
@@ -59,35 +60,34 @@ class LoginViewModel @Inject constructor(
                         email = user.kakaoAccount?.email
                         nickname = user.kakaoAccount?.profile?.nickname
 
-CoroutineScope(Dispatchers.IO).launch {
-    // 저장된 내용이 없는 경우
-    if (userDao.countAll() < 1) {
-        userDao.insertAll(
-            UserData(
-                0,
-                nickname!!,
-                email!!,
-                "0".toFloat()
-            )
-        )
-        Log.d("Room", "UserData 저장")
-    }
-    // 저장된 내용이 다른 경우
-    else if (userDao.findNameByEmail(email!!) != nickname) {
-        userDao.insertAll(
-            UserData(
-                0,
-                nickname!!,
-                email!!,
-                "0".toFloat()
-            )
-        )
-        Log.d("Room", "UserData 저장")
-    }
-    else{
-        Log.d("Room", "이미 저장된 내용")
-    }
-}
+                        CoroutineScope(Dispatchers.IO).launch {
+                            // 저장된 내용이 없는 경우
+                            if (userDao.countAll() < 1) {
+                                userDao.insertAll(
+                                    UserData(
+                                        0,
+                                        nickname!!,
+                                        email!!,
+                                        "0".toFloat()
+                                    )
+                                )
+                                Log.d("Room", "UserData 저장")
+                            }
+                            // 저장된 내용이 다른 경우
+                            else if (userDao.findNameByEmail(email!!) != nickname) {
+                                userDao.insertAll(
+                                    UserData(
+                                        0,
+                                        nickname!!,
+                                        email!!,
+                                        "0".toFloat()
+                                    )
+                                )
+                                Log.d("Room", "UserData 저장")
+                            } else {
+                                Log.d("Room", "이미 저장된 내용")
+                            }
+                        }
 
                         val intent = Intent(
                             context,

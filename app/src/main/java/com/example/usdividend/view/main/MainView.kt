@@ -1,10 +1,9 @@
-package com.example.usdividend
+package com.example.usdividend.view.main
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,36 +13,41 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.usdividend.R
 import com.example.usdividend.data.type.NaviDestination
-import com.example.usdividend.screen.StockScreen
+import com.example.usdividend.navigator.NavigationGraph
 import com.example.usdividend.ui.theme.UsDividendTheme
+import com.example.usdividend.view.dividend.DividendViewModel
+import com.example.usdividend.view.setting.SettingViewModel
+import com.example.usdividend.view.stock.StockViewModel
 
 @Composable
-fun MainScreen(
+fun MainView(
+    stockViewModel: StockViewModel = hiltViewModel(),
+    dividendViewModel: DividendViewModel = hiltViewModel(),
+    settingViewModel: SettingViewModel = hiltViewModel(),
     context: Context
 ) {
-    var selectedItem by remember { mutableStateOf(1) }
+    var selectedItem by remember { mutableIntStateOf(1) }
 
     val navController = rememberNavController()
 
-    val items = listOf<NaviDestination>(
+    val items = listOf(
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.money_icon),
-            "배당",
+            stringResource(id = R.string.money),
             "dividendScreen"
         ),
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.stock_icon),
-            "주식",
+            stringResource(id = R.string.stock),
             "stockScreen"
         ),
         NaviDestination(
             ImageVector.vectorResource(id = R.drawable.setting_icon),
-            name = "설정",
+            stringResource(id = R.string.setting),
             "settingScreen"
         )
     )
@@ -57,7 +61,7 @@ fun MainScreen(
                             0 -> stringResource(id = R.string.money)
                             1 -> stringResource(id = R.string.stock)
                             2 -> stringResource(id = R.string.setting)
-                            else -> "주식"
+                            else -> stringResource(id = R.string.stock)
                         },
                         color = colorResource(id = R.color.white)
                     )
@@ -104,25 +108,14 @@ fun MainScreen(
         },
         content = {
             Box(Modifier.padding(it)) {
-                NavigationGraph(navController = navController, context = context)
+                NavigationGraph(
+                    navController = navController,
+                    context = context,
+                    stockViewModel, dividendViewModel, settingViewModel
+                )
             }
         }
     )
-}
-
-@Composable
-fun NavigationGraph(navController: NavHostController, context: Context) {
-    NavHost(navController = navController, startDestination = "stockScreen") {
-        composable("dividendScreen") {
-            DividendScreen(context)
-        }
-        composable("stockScreen") {
-            StockScreen(context)
-        }
-        composable("settingScreen") {
-            SettingScreen(context)
-        }
-    }
 }
 
 @Preview(showSystemUi = true, showBackground = true)
