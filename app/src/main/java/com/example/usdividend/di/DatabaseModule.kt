@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.example.usdividend.R
 import com.example.usdividend.data.local.AppDatabase
+import com.example.usdividend.data.local.dao.DividendDao
+import com.example.usdividend.data.local.dao.StockDao
 import com.example.usdividend.data.local.dao.UserDao
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +31,12 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun provideUserDAO(database: AppDatabase) : UserDao = database.userDao()
+
+    @Provides
+    @Singleton
+    fun provideStockDAO(database: AppDatabase) : StockDao = database.stockDao()
+
+    @Provides
+    @Singleton
+    fun provideDividendDAO(database: AppDatabase) : DividendDao = database.dividendDao()
 }
