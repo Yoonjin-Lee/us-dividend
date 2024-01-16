@@ -5,17 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.usdividend.activity.MainActivity
-import com.example.usdividend.data.local.AppDatabase
+import com.example.usdividend.view.main.MainActivity
 import com.example.usdividend.data.local.dao.UserDao
 import com.example.usdividend.data.repository.LoginRepository
-import com.example.usdividend.data.repository.UserRepository
-import com.example.usdividend.data.type.server.ServerNameEmailData
 import com.example.usdividend.data.type.UserData
-import com.example.usdividend.di.Application
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -25,20 +19,17 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val userRepository: UserRepository
+    private val userDao: UserDao
 ) : ViewModel() {
     @Inject lateinit var loginRepository: LoginRepository
 
@@ -68,28 +59,35 @@ class LoginViewModel @Inject constructor(
                         email = user.kakaoAccount?.email
                         nickname = user.kakaoAccount?.profile?.nickname
 
-                        CoroutineScope(Dispatchers.IO).launch {
-                            // 저장된 내용이 없는 경우
-                            if (userRepository.countAll() < 1) {
-                                userRepository.insertAll(
-                                    UserData(
-                                        0,
-                                        nickname!!,
-                                        email!!,
-                                        "0".toFloat()
-                                    )
-                                )
-                            }
-                            // 저장된 내용이 다른 경
-                            else if (userRepository.findNameByEmail(email!!) != nickname) {
-                                UserData(
-                                    0,
-                                    nickname!!,
-                                    email!!,
-                                    "0".toFloat()
-                                )
-                            }
-                        }
+CoroutineScope(Dispatchers.IO).launch {
+    // 저장된 내용이 없는 경우
+    if (userDao.countAll() < 1) {
+        userDao.insertAll(
+            UserData(
+                0,
+                nickname!!,
+                email!!,
+                "0".toFloat()
+            )
+        )
+        Log.d("Room", "UserData 저장")
+    }
+    // 저장된 내용이 다른 경우
+    else if (userDao.findNameByEmail(email!!) != nickname) {
+        userDao.insertAll(
+            UserData(
+                0,
+                nickname!!,
+                email!!,
+                "0".toFloat()
+            )
+        )
+        Log.d("Room", "UserData 저장")
+    }
+    else{
+        Log.d("Room", "이미 저장된 내용")
+    }
+}
 
                         val intent = Intent(
                             context,
@@ -171,8 +169,8 @@ class LoginViewModel @Inject constructor(
 
                             CoroutineScope(Dispatchers.IO).launch {
                                 // 저장된 내용이 없는 경우
-                                if (userRepository.countAll() < 1) {
-                                    userRepository.insertAll(
+                                if (userDao.countAll() < 1) {
+                                    userDao.insertAll(
                                         UserData(
                                             0,
                                             nickname!!,
@@ -182,7 +180,7 @@ class LoginViewModel @Inject constructor(
                                     )
                                 }
                                 // 저장된 내용이 다른 경우
-                                else if (userRepository.findNameByEmail(email!!) != nickname) {
+                                else if (userDao.findNameByEmail(email!!) != nickname) {
                                     UserData(
                                         0,
                                         nickname!!,
@@ -264,8 +262,8 @@ class LoginViewModel @Inject constructor(
 
                 CoroutineScope(Dispatchers.IO).launch {
                     // 저장된 내용이 없는 경우
-                    if (userRepository.countAll() < 1) {
-                        userRepository.insertAll(
+                    if (userDao.countAll() < 1) {
+                        userDao.insertAll(
                             UserData(
                                 0,
                                 nickname!!,
@@ -275,7 +273,7 @@ class LoginViewModel @Inject constructor(
                         )
                     }
                     // 저장된 내용이 다른 경우
-                    else if (userRepository.findNameByEmail(email!!) != nickname) {
+                    else if (userDao.findNameByEmail(email!!) != nickname) {
                         UserData(
                             0,
                             nickname!!,
