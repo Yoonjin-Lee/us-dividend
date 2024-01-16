@@ -3,7 +3,6 @@ package com.example.usdividend.screen
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,26 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
-import com.example.usdividend.activity.holdingDollars
-import com.example.usdividend.activity.userid
-import com.example.usdividend.authService
-import com.example.usdividend.data.ServerPostStock
-import com.example.usdividend.data.StockListCard
-import com.example.usdividend.server.ApiService
-import com.example.usdividend.server.getRetrofit
+import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
 fun StockInputScreen(
@@ -73,72 +61,72 @@ fun StockInputScreen(
             TextButton(
                 onClick = {
                     /**********서버 연결************/
-                    authService.postStock(
-                        ServerPostStock(
-                            userId = userid!!,
-                            stockName = Name,
-                            price = Price.toFloat(),
-                            exchangeRate = Exchange.toFloat(),
-                            quantity = Quantitiy.toInt()
-                        )
-                    ).enqueue(object : Callback<String> {
-                        override fun onResponse(call: Call<String>, response: Response<String>) {
-                            if (response.isSuccessful) {
-                                val data = response.body()
-
-                                if (data != null) {
-                                    //데이터가 잘 왔는지 로그 찍어보기
-                                    Log.d("retrofit", "보유 주식 등록하기")
-                                    Log.d("test_retrofit", "받은 정보 :" + data)
-
-                                    mystockRegister!!.register(
-                                        StockListCard(
-                                            company = Name,
-                                            quantity = Quantitiy,
-                                            price = Price,
-                                            exchange = Exchange
-                                        )
-                                    )
-                                    Log.d("value", "${Name} ${Quantitiy}")
-                                    Log.d("register", "완료")
-
-                                } else {
-                                    //정보를 받지 못했을 때 로그 찍기
-                                    Log.d("retrofit", "보유 주식 등록하기")
-                                    Log.w("retrofit", "실패 데이터 없음 ${response.code()}")
-                                }
-                            }
-                        }
-
-                        override fun onFailure(call: Call<String>, t: Throwable) {
-                            Log.d("retrofit", "보유 주식 등록하기")
-                            Log.w("retrofit", "정보 접근 실패", t)
-                        }
-                    })
+//                    authService.postStock(
+//                        ServerPostStock(
+//                            userId = userid!!,
+//                            stockName = Name,
+//                            price = Price.toFloat(),
+//                            exchangeRate = Exchange.toFloat(),
+//                            quantity = Quantitiy.toInt()
+//                        )
+//                    ).enqueue(object : Callback<String> {
+//                        override fun onResponse(call: Call<String>, response: Response<String>) {
+//                            if (response.isSuccessful) {
+//                                val data = response.body()
+//
+//                                if (data != null) {
+//                                    //데이터가 잘 왔는지 로그 찍어보기
+//                                    Log.d("retrofit", "보유 주식 등록하기")
+//                                    Log.d("test_retrofit", "받은 정보 :" + data)
+//
+//                                    mystockRegister!!.register(
+//                                        StockListCard(
+//                                            company = Name,
+//                                            quantity = Quantitiy,
+//                                            price = Price,
+//                                            exchange = Exchange
+//                                        )
+//                                    )
+//                                    Log.d("value", "${Name} ${Quantitiy}")
+//                                    Log.d("register", "완료")
+//
+//                                } else {
+//                                    //정보를 받지 못했을 때 로그 찍기
+//                                    Log.d("retrofit", "보유 주식 등록하기")
+//                                    Log.w("retrofit", "실패 데이터 없음 ${response.code()}")
+//                                }
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<String>, t: Throwable) {
+//                            Log.d("retrofit", "보유 주식 등록하기")
+//                            Log.w("retrofit", "정보 접근 실패", t)
+//                        }
+//                    })
 
                     /*********보유 달러 업데이트*********/
-                    authService.getDollars(userid!!).enqueue(object : Callback<String>{
-                        override fun onResponse(call: Call<String>, response: Response<String>) {
-                            if (response.isSuccessful){
-                                val data = JSONObject(response.body().toString()).getString("result")
-
-                                if (data!=null){
-                                    sharedViewModel.dollars = data.toFloat()
-                                    holdingDollars = data.toFloat()
-                                    Log.d("retrofit", "보유 달러 데이터 : ${data}")
-
-                                    cur.findActivity().finish()
-                                } else {
-                                    Log.d("retrofit", "보유 달러 데이터 없음")
-                                }
-                            }
-                        }
-
-                        override fun onFailure(call: Call<String>, t: Throwable) {
-                            Log.d("retrofit", "보유 달러 업데이트")
-                            Log.w("retrofit", "정보 접근 실패", t)
-                        }
-                    })
+//                    authService.getDollars(userid!!).enqueue(object : Callback<String>{
+//                        override fun onResponse(call: Call<String>, response: Response<String>) {
+//                            if (response.isSuccessful){
+//                                val data = JSONObject(response.body().toString()).getString("result")
+//
+//                                if (data!=null){
+//                                    sharedViewModel.dollars = data.toFloat()
+//                                    holdingDollars = data.toFloat()
+//                                    Log.d("retrofit", "보유 달러 데이터 : ${data}")
+//
+//                                    cur.findActivity().finish()
+//                                } else {
+//                                    Log.d("retrofit", "보유 달러 데이터 없음")
+//                                }
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<String>, t: Throwable) {
+//                            Log.d("retrofit", "보유 달러 업데이트")
+//                            Log.w("retrofit", "정보 접근 실패", t)
+//                        }
+//                    })
                 },
                 modifier = Modifier
                     .fillMaxWidth()

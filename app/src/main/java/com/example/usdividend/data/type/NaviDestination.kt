@@ -1,4 +1,4 @@
-package com.example.usdividend.data
+package com.example.usdividend.data.type
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

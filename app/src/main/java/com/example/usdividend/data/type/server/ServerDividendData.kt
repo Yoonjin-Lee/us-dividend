@@ -1,4 +1,4 @@
-package com.example.usdividend.data
+package com.example.usdividend.data.type.server
 
 import com.google.gson.annotations.SerializedName
 import java.sql.Timestamp

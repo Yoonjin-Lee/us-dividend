@@ -1,4 +1,4 @@
-package com.example.usdividend.data
+package com.example.usdividend.data.type
 
 data class StockListCard(
     val company: String,

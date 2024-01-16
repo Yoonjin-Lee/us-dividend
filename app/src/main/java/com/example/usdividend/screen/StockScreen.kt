@@ -32,12 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.*
 import com.example.usdividend.R
 import com.example.usdividend.activity.StockInputActivity
-import com.example.usdividend.activity.holdingDollars
-import com.example.usdividend.activity.userid
-import com.example.usdividend.data.ServerDividendData
-import com.example.usdividend.data.StockIdData
-import com.example.usdividend.data.StockListCard
-import com.example.usdividend.data.UserData
+import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import org.json.JSONObject
@@ -60,66 +55,66 @@ fun StockScreen(
 
     if (getStockList) {
         //로그인 시 받은 보유 달러 저장
-        sharedViewModel.dollars = holdingDollars!!.toFloat()
+//        sharedViewModel.dollars = holdingDollars!!.toFloat()
 
-        authService.getStockList(userid!!).enqueue(object : Callback<String> {
-            override fun onResponse(
-                call: Call<String>,
-                response: Response<String>
-            ) {
-                if (response.isSuccessful) {
-                    val data = JSONObject(response.body().toString()).getJSONArray("result")
-
-                    if (data != null) {
-                        //데이터가 잘 왔는지 로그 찍어보기
-                        Log.d("retrofit", "유저 id로 보유주식 얻기")
-                        Log.d("test_retrofit", "받은 정보 :" + data)
-
-                        val list = ArrayList<JSONObject>()
-
-                        for (i in 0 until data.length()) {
-                            list.add(
-                                data.getJSONObject(i)
-                            )
-                        }
-
-                        for (i in list) {
-                            //주식 리스트에 등록
-                            stockList.add(
-                                StockListCard(
-                                    company = i.getString("stockName"),
-                                    quantity = i.getString("quantity"),
-                                    exchange = i.getString("exchangeRate"),
-                                    price = i.getString("price")
-                                )
-                            )
-                            //회사 리스트에 등록
-                            companyList.add(i.getString("stockName"))
-                            Log.d("retrofit", "companyList : ${companyList}")
-                            //주식 아이디 리스트에 등록
-                            stockIdList.add(
-                                StockIdData(
-                                    holdingId = i.getString("holdingId").toInt(),
-                                    stockName = i.getString("stockName"),
-                                    stockId = i.getString("stockId").toInt(),
-                                    quantity = i.getString("quantity").toInt()
-                                )
-                            )
-                            Log.d("retrofit", "stockIdList : ${stockIdList}")
-                        }
-                    } else {
-                        //정보를 받지 못했을 때 로그 찍기
-                        Log.d("retrofit", "유저 id로 보유주식 얻기")
-                        Log.w("retrofit", "실패 ${response.code()}")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d("retrofit", "유저 id로 보유주식 얻기")
-                Log.w("retrofit", "정보 접근 실패", t)
-            }
-        })
+//        authService.getStockList(userid!!).enqueue(object : Callback<String> {
+//            override fun onResponse(
+//                call: Call<String>,
+//                response: Response<String>
+//            ) {
+//                if (response.isSuccessful) {
+//                    val data = JSONObject(response.body().toString()).getJSONArray("result")
+//
+//                    if (data != null) {
+//                        //데이터가 잘 왔는지 로그 찍어보기
+//                        Log.d("retrofit", "유저 id로 보유주식 얻기")
+//                        Log.d("test_retrofit", "받은 정보 :" + data)
+//
+//                        val list = ArrayList<JSONObject>()
+//
+//                        for (i in 0 until data.length()) {
+//                            list.add(
+//                                data.getJSONObject(i)
+//                            )
+//                        }
+//
+//                        for (i in list) {
+//                            //주식 리스트에 등록
+//                            stockList.add(
+//                                StockListCard(
+//                                    company = i.getString("stockName"),
+//                                    quantity = i.getString("quantity"),
+//                                    exchange = i.getString("exchangeRate"),
+//                                    price = i.getString("price")
+//                                )
+//                            )
+//                            //회사 리스트에 등록
+//                            companyList.add(i.getString("stockName"))
+//                            Log.d("retrofit", "companyList : ${companyList}")
+//                            //주식 아이디 리스트에 등록
+//                            stockIdList.add(
+//                                StockIdData(
+//                                    holdingId = i.getString("holdingId").toInt(),
+//                                    stockName = i.getString("stockName"),
+//                                    stockId = i.getString("stockId").toInt(),
+//                                    quantity = i.getString("quantity").toInt()
+//                                )
+//                            )
+//                            Log.d("retrofit", "stockIdList : ${stockIdList}")
+//                        }
+//                    } else {
+//                        //정보를 받지 못했을 때 로그 찍기
+//                        Log.d("retrofit", "유저 id로 보유주식 얻기")
+//                        Log.w("retrofit", "실패 ${response.code()}")
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<String>, t: Throwable) {
+//                Log.d("retrofit", "유저 id로 보유주식 얻기")
+//                Log.w("retrofit", "정보 접근 실패", t)
+//            }
+//        })
         getStockList = false
     }
 
@@ -177,29 +172,29 @@ fun StockScreen(
                     )
                 )
                 IconButton(onClick = {
-                    authService.getExchange().enqueue(object : Callback<String> {
-                        override fun onResponse(call: Call<String>, response: Response<String>) {
-                            if (response.isSuccessful) {
-                                val data = JSONObject(
-                                    response.body().toString()
-                                ).getString("result")
-
-                                if (data != null) {
-                                    //데이터가 잘 왔는지 로그 찍어보기
-                                    Log.d("test_retrofit", "받은 정보 :" + data)
-                                    exchangeData = data
-                                } else {
-                                    //정보를 받지 못했을 때 로그 찍기
-                                    Log.w("retrofit", "환율 실패 ${response.code()}")
-                                }
-                            }
-                        }
-
-                        override fun onFailure(call: Call<String>, t: Throwable) {
-                            Log.w("retrofit", "환율 접근 실패", t)
-                            Log.w("retrofit", "환율 접근 실패 response")
-                        }
-                    })
+//                    authService.getExchange().enqueue(object : Callback<String> {
+//                        override fun onResponse(call: Call<String>, response: Response<String>) {
+//                            if (response.isSuccessful) {
+//                                val data = JSONObject(
+//                                    response.body().toString()
+//                                ).getString("result")
+//
+//                                if (data != null) {
+//                                    //데이터가 잘 왔는지 로그 찍어보기
+//                                    Log.d("test_retrofit", "받은 정보 :" + data)
+//                                    exchangeData = data
+//                                } else {
+//                                    //정보를 받지 못했을 때 로그 찍기
+//                                    Log.w("retrofit", "환율 실패 ${response.code()}")
+//                                }
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<String>, t: Throwable) {
+//                            Log.w("retrofit", "환율 접근 실패", t)
+//                            Log.w("retrofit", "환율 접근 실패 response")
+//                        }
+//                    })
                 }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
@@ -220,7 +215,7 @@ fun StockScreen(
                 )
                 Spacer(modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp))
                 Text(
-                    text = holdingDollars.toString(),
+                    text = "",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium

@@ -2,7 +2,6 @@ package com.example.usdividend
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +32,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.activity.DividendHistoryActivity
-import com.example.usdividend.activity.holdingDollars
-import com.example.usdividend.activity.userid
-import com.example.usdividend.data.DividendListData
-import com.example.usdividend.data.StockIdData
-import com.example.usdividend.data.StockListCard
 import com.example.usdividend.screen.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
@@ -48,10 +41,6 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
 fun DividendScreen(
@@ -78,49 +67,49 @@ fun DividendScreen(
         for (i in companyList){
             cList.add(i)
         }
-        authService.getDividendHistory(userId = userid!!).enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful) {
-                    val data = JSONObject(response.body().toString()).getJSONArray("result")
-
-                    if (data != null) {
-                        //데이터가 잘 왔는지 로그 찍어보기
-                        Log.d("retrofit", "배당 목록 가져오기")
-                        Log.d("test_retrofit", "받은 정보 :" + data)
-
-                        val list = ArrayList<JSONObject>()
-
-                        for (i in 0 until data.length()) {
-                            list.add(
-                                data.getJSONObject(i)
-                            )
-                        }
-
-                        for (i in list) {
-                            //배당 리스트에 등록
-                            dividendList.add(
-                                DividendListData(
-                                    stockName = i.getString("stockName"),
-                                    dividend = i.getString("dividend").toFloat(),
-                                    createdMonth = i.getString("createdAt").toString()
-                                        .split("-")[1].toInt()
-                                )
-                            )
-                            Log.d("retrofit", "dividendList : ${dividendList}")
-                        }
-                    } else {
-                        //정보를 받지 못했을 때 로그 찍기
-                        Log.d("retrofit", "배당 목록 가져오기")
-                        Log.w("retrofit", "실패 ${response.code()}")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d("retrofit", "배당 목록 가져오기")
-                Log.w("retrofit", "실패", t)
-            }
-        })
+//        authService.getDividendHistory(userId = userid!!).enqueue(object : Callback<String> {
+//            override fun onResponse(call: Call<String>, response: Response<String>) {
+//                if (response.isSuccessful) {
+//                    val data = JSONObject(response.body().toString()).getJSONArray("result")
+//
+//                    if (data != null) {
+//                        //데이터가 잘 왔는지 로그 찍어보기
+//                        Log.d("retrofit", "배당 목록 가져오기")
+//                        Log.d("test_retrofit", "받은 정보 :" + data)
+//
+//                        val list = ArrayList<JSONObject>()
+//
+//                        for (i in 0 until data.length()) {
+//                            list.add(
+//                                data.getJSONObject(i)
+//                            )
+//                        }
+//
+//                        for (i in list) {
+//                            //배당 리스트에 등록
+//                            dividendList.add(
+//                                DividendListData(
+//                                    stockName = i.getString("stockName"),
+//                                    dividend = i.getString("dividend").toFloat(),
+//                                    createdMonth = i.getString("createdAt").toString()
+//                                        .split("-")[1].toInt()
+//                                )
+//                            )
+//                            Log.d("retrofit", "dividendList : ${dividendList}")
+//                        }
+//                    } else {
+//                        //정보를 받지 못했을 때 로그 찍기
+//                        Log.d("retrofit", "배당 목록 가져오기")
+//                        Log.w("retrofit", "실패 ${response.code()}")
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<String>, t: Throwable) {
+//                Log.d("retrofit", "배당 목록 가져오기")
+//                Log.w("retrofit", "실패", t)
+//            }
+//        })
         getDividendHistory = false
     }
 
@@ -199,7 +188,8 @@ fun DollarPart(
                 )
             )
             Text(
-                text = sharedViewModel.dollars.toString(),
+//                text = sharedViewModel.dollars.toString(),
+                text = "",
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium

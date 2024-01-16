@@ -1,7 +1,11 @@
-package com.example.usdividend.server
+package com.example.usdividend.di
 
 import com.example.usdividend.data.*
+import com.example.usdividend.data.type.server.ServerNameEmailData
+import com.example.usdividend.data.type.server.ServerPostDividend
+import com.example.usdividend.data.type.server.ServerPostStock
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -11,9 +15,9 @@ import retrofit2.http.Path
 interface ApiService {
     //로그인
     @POST("/users/login")
-    fun signUp(
-        @Body nameEmailData: NameEmailData
-    ): Call<String>
+    suspend fun signUp(
+        @Body serverNameEmailData: ServerNameEmailData
+    ): Response<String>
 
     //로그아웃
     @PATCH("/users/{userId}")

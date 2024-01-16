@@ -18,10 +18,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.usdividend.data.NaviDestination
+import com.example.usdividend.data.type.NaviDestination
 import com.example.usdividend.screen.StockScreen
 import com.example.usdividend.ui.theme.UsDividendTheme
-import com.google.android.material.composethemeadapter.*
 
 @Composable
 fun MainScreen(
