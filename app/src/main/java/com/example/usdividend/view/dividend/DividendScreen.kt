@@ -32,7 +32,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.activity.DividendHistoryActivity
-import com.example.usdividend.screen.DividendDialog
+import com.example.usdividend.view.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme

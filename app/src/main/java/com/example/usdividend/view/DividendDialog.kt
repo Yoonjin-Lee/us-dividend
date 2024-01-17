@@ -1,4 +1,4 @@
-package com.example.usdividend.screen
+package com.example.usdividend.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,7 +29,6 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
-import com.example.usdividend.stockIdList
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.UsDividendTheme
 
@@ -108,19 +107,6 @@ fun DividendDialog(
                                 sharedViewModel.myCompany = company
                                 sharedViewModel.myVariable = true
                                 visible = false
-
-                                //해당하는 주식 정보 찾기
-                                var hId = 0
-                                var sId = 0
-                                var q = 0
-                                for(i in stockIdList){
-                                    if (i.stockName == sharedViewModel.myCompany){
-                                        hId = i.holdingId
-                                        sId = i.stockId
-                                        q = i.quantity
-                                        break
-                                    }
-                                }
 
 //                                /**********배당금 로그 보내기*********/
 //                                authService.postDividend(

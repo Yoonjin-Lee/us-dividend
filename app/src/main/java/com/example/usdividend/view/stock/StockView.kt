@@ -1,8 +1,6 @@
 package com.example.usdividend.view.stock
 
 import android.content.Context
-import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,13 +10,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -31,16 +27,27 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.usdividend.R
 import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
-import com.example.usdividend.ui.theme.Main
 
 @Composable
 fun StockView(
-    viewModel: StockViewModel = hiltViewModel(),
-    context: Context
+    viewModel: StockViewModel = hiltViewModel()
 ) {
-    val stockList = viewModel.stockList.observeAsState()
-    stockList.value?.let {
-        stockList.value = viewModel.getStockList()
+    val stockCardList = remember{
+        mutableStateListOf<StockListCard>()
+    }
+
+    // viewModel로부터 stockList를 받아 stockListCard 형태로 변환
+    viewModel.stockList.observe(LocalLifecycleOwner.current){
+        for(stockData in it){
+            stockCardList.add(
+                StockListCard(
+                    stockData.stockName,
+                    stockData.stockQuantity,
+                    stockData.exchange,
+                    stockData.stockPrice
+                )
+            )
+        }
     }
 
     var getStockList by remember {
@@ -63,9 +70,7 @@ fun StockView(
                 .background(colorResource(id = R.color.gray), RectangleShape)
                 .fillMaxWidth()
         ) {
-            var exchangeData by remember {
-                mutableStateOf("0000")
-            }
+            val exchangeData = "0000"
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(18.dp, 23.dp)
@@ -96,6 +101,7 @@ fun StockView(
                     )
                 )
                 IconButton(onClick = {
+                    viewModel.showToast("기능 추가 예정")
                 }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
@@ -153,6 +159,7 @@ fun StockView(
                     Spacer(modifier = Modifier.weight(1f, true))
                     IconButton(
                         onClick = {
+                            // StockInputActivity로 이동
                             viewModel.move()
                         }) {
                         Icon(
@@ -163,77 +170,10 @@ fun StockView(
                 }
                 LazyColumn( // scroll view main part
                 ) {
-                    items(stockList) {
+                    items(stockCardList) {
                         StockListDump(stockListCard = it)
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun StockListDump(stockListCard: StockListCard) {
-    OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(90.dp),
-        shape = RectangleShape,
-        border = BorderStroke(1.dp, Gray)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(12.dp),
-        ) {
-            Text(
-                text = stockListCard.company.substring(0, 1),
-                modifier = Modifier
-                    .size(40.dp, 40.dp)
-                    .drawBehind {
-                        drawCircle(
-                            color = Main,
-                            radius = this.size.maxDimension / 2.0f
-                        )
-                    },
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-            )
-            Spacer(modifier = Modifier.padding(10.dp))
-            Text(
-                text = stockListCard.company,
-                textAlign = TextAlign.Center,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.weight(1f, true))
-            Column(
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Text(
-                    text = stringResource(id = R.string.quantity) + "$stockListCard.quantity",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-                Text(
-                    text = stringResource(id = R.string.exchange) + "$stockListCard.exchange",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-                Text(
-                    text = stringResource(id = R.string.price) + "$stockListCard.price",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                )
             }
         }
     }

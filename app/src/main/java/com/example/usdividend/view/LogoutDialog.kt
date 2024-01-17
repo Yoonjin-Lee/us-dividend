@@ -1,8 +1,6 @@
-package com.example.usdividend.screen
+package com.example.usdividend.view
 
 import android.content.Context
-import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,15 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
-import com.example.usdividend.view.login.LoginActivity
 import com.example.usdividend.ui.theme.Red
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
 fun LogoutDialog(
@@ -103,34 +96,7 @@ fun LogoutDialog(
                         }
                         TextButton( // yes
                             onClick = {
-//                                authService.logout(userid!!).enqueue(object : Callback<String>{
-//                                    override fun onResponse(
-//                                        call: Call<String>,
-//                                        response: Response<String>
-//                                    ) {
-//                                        if (response.isSuccessful){
-//                                            val data = response.code()
-//
-//                                            visible = false
-//
-//                                            if (data == 200){
-//                                                Log.d("retrofit", "로그아웃")
-//                                                Log.d("retrofit", "로그아웃 성공 ${data}")
-//
-//                                                val intent = Intent(context, LoginActivity::class.java)
-//                                                ContextCompat.startActivity(context, intent, null)
-//                                            }else{
-//                                                Log.d("retrofit", "로그아웃")
-//                                                Log.d("retrofit", "실패 ${response.message()}")
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    override fun onFailure(call: Call<String>, t: Throwable) {
-//                                        Log.d("retrofit", "로그아웃")
-//                                        Log.w("retrofit", "정보 접근 실패", t)
-//                                    }
-//                                })
+
                             },
                             modifier = Modifier
                                 .weight(1f)

@@ -2,6 +2,7 @@ package com.example.usdividend.view.stock
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,16 +19,23 @@ class StockViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stockDao: StockDao
 ) : ViewModel() {
-    //
+    init {
+        getStockList()
+    }
+
     private val _stockList = MutableLiveData<List<StockData>>()
     val stockList : LiveData<List<StockData>> get() =  _stockList
 
-    fun getStockList() = viewModelScope.launch {
+    private fun getStockList() = viewModelScope.launch {
         _stockList.value = stockDao.getAllStockData()
     }
 
     fun move(){
         val intent = Intent(context, StockInputActivity::class.java)
         startActivity(context, intent, null)
+    }
+
+    fun showToast(message : String){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 }
