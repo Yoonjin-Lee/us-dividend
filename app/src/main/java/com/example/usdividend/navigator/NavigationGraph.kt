@@ -26,7 +26,7 @@ fun NavigationGraph(
             DividendScreen(context)
         }
         composable("stockScreen") {
-            StockView(stockViewModel, context)
+            StockView(stockViewModel)
         }
         composable("settingScreen") {
             SettingView(context)

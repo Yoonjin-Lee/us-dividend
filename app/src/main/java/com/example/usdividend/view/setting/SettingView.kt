@@ -17,12 +17,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.usdividend.screen.LogoutDialog
+import com.example.usdividend.view.LogoutDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
 import com.example.usdividend.ui.theme.Red
-import com.example.usdividend.view.setting.SettingViewModel
 
 @Composable
 fun SettingView(
