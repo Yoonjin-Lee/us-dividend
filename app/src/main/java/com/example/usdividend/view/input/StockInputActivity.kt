@@ -1,17 +1,17 @@
-package com.example.usdividend.activity
+package com.example.usdividend.view.input
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.usdividend.screen.DividendHistoryScreen
+import com.example.usdividend.view.input.StockInputScreen
 import com.example.usdividend.ui.theme.UsDividendTheme
 
-class DividendHistoryActivity : ComponentActivity() {
+class StockInputActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             UsDividendTheme {
-                DividendHistoryScreen(this)
+                StockInputScreen(this)
             }
         }
     }

@@ -7,27 +7,26 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.usdividend.activity.StockInputActivity
+import com.example.usdividend.view.input.StockInputActivity
 import com.example.usdividend.data.local.dao.StockDao
 import com.example.usdividend.data.type.StockData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class StockViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stockDao: StockDao
 ) : ViewModel() {
-    init {
-        getStockList()
-    }
-
     private val _stockList = MutableLiveData<List<StockData>>()
     val stockList : LiveData<List<StockData>> get() =  _stockList
 
-    private fun getStockList() = viewModelScope.launch {
-        _stockList.value = stockDao.getAllStockData()
+    private fun getStockList() = CoroutineScope(Dispatchers.IO).launch {
+        _stockList.postValue(stockDao.getAllStockData())
     }
 
     fun move(){
@@ -37,5 +36,9 @@ class StockViewModel @Inject constructor(
 
     fun showToast(message : String){
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
+    init {
+        getStockList()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.usdividend.screen
+package com.example.usdividend.view.history
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
@@ -23,6 +23,7 @@ import com.example.usdividend.dividendList
 import com.example.usdividend.function.excel
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
+import com.example.usdividend.view.input.findActivity
 
 
 @Composable

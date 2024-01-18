@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
     //liveData
     implementation "androidx.compose.runtime:runtime-livedata:1.5.4"
 
