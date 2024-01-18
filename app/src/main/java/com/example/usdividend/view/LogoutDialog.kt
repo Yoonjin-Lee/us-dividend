@@ -26,16 +26,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
 import com.example.usdividend.ui.theme.Red
+import com.example.usdividend.view.setting.SettingViewModel
 
 @Composable
 fun LogoutDialog(
-    v: Boolean,
-    sharedViewModel: SharedViewModel = viewModel(),
-    context: Context
+    settingViewModel: SettingViewModel = hiltViewModel()
 ) {
     var visible by remember {
         mutableStateOf(true)
@@ -96,7 +96,7 @@ fun LogoutDialog(
                         }
                         TextButton( // yes
                             onClick = {
-
+                                settingViewModel.logout()
                             },
                             modifier = Modifier
                                 .weight(1f)

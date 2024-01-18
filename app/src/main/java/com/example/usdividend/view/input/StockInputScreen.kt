@@ -1,4 +1,4 @@
-package com.example.usdividend.screen
+package com.example.usdividend.view.input
 
 import android.content.Context
 import android.content.ContextWrapper
@@ -25,16 +25,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
-import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
-import com.example.usdividend.ui.theme.UsDividendTheme
 
 @Composable
 fun StockInputScreen(
@@ -60,73 +57,8 @@ fun StockInputScreen(
         bottomBar = { // 확인 버튼
             TextButton(
                 onClick = {
-                    /**********서버 연결************/
-//                    authService.postStock(
-//                        ServerPostStock(
-//                            userId = userid!!,
-//                            stockName = Name,
-//                            price = Price.toFloat(),
-//                            exchangeRate = Exchange.toFloat(),
-//                            quantity = Quantitiy.toInt()
-//                        )
-//                    ).enqueue(object : Callback<String> {
-//                        override fun onResponse(call: Call<String>, response: Response<String>) {
-//                            if (response.isSuccessful) {
-//                                val data = response.body()
-//
-//                                if (data != null) {
-//                                    //데이터가 잘 왔는지 로그 찍어보기
-//                                    Log.d("retrofit", "보유 주식 등록하기")
-//                                    Log.d("test_retrofit", "받은 정보 :" + data)
-//
-//                                    mystockRegister!!.register(
-//                                        StockListCard(
-//                                            company = Name,
-//                                            quantity = Quantitiy,
-//                                            price = Price,
-//                                            exchange = Exchange
-//                                        )
-//                                    )
-//                                    Log.d("value", "${Name} ${Quantitiy}")
-//                                    Log.d("register", "완료")
-//
-//                                } else {
-//                                    //정보를 받지 못했을 때 로그 찍기
-//                                    Log.d("retrofit", "보유 주식 등록하기")
-//                                    Log.w("retrofit", "실패 데이터 없음 ${response.code()}")
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: Call<String>, t: Throwable) {
-//                            Log.d("retrofit", "보유 주식 등록하기")
-//                            Log.w("retrofit", "정보 접근 실패", t)
-//                        }
-//                    })
-
                     /*********보유 달러 업데이트*********/
-//                    authService.getDollars(userid!!).enqueue(object : Callback<String>{
-//                        override fun onResponse(call: Call<String>, response: Response<String>) {
-//                            if (response.isSuccessful){
-//                                val data = JSONObject(response.body().toString()).getString("result")
-//
-//                                if (data!=null){
-//                                    sharedViewModel.dollars = data.toFloat()
-//                                    holdingDollars = data.toFloat()
-//                                    Log.d("retrofit", "보유 달러 데이터 : ${data}")
-//
-//                                    cur.findActivity().finish()
-//                                } else {
-//                                    Log.d("retrofit", "보유 달러 데이터 없음")
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: Call<String>, t: Throwable) {
-//                            Log.d("retrofit", "보유 달러 업데이트")
-//                            Log.w("retrofit", "정보 접근 실패", t)
-//                        }
-//                    })
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,15 +315,6 @@ fun StockInputContent(
     }
 }
 
-interface OnStockRegister{
-    fun register(stockListCard: StockListCard)
-}
-
-var mystockRegister : OnStockRegister? = null
-fun setStockRegister(istockRegister: OnStockRegister) {
-    mystockRegister = istockRegister
-}
-
 fun Context.findActivity(): ComponentActivity {
     var context = this
     while (context is ContextWrapper) {
@@ -400,12 +323,4 @@ fun Context.findActivity(): ComponentActivity {
     }
     Log.d("activity", "no")
     throw IllegalStateException("no activity")
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewStockInputScreen() {
-    UsDividendTheme {
-//        StockInputScreen()
-    }
 }

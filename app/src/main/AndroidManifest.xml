@@ -42,12 +42,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.StockInputActivity"/>
+        <activity android:name=".view.input.StockInputActivity"/>
         <activity
             android:name=".view.main.MainActivity"
             android:exported="true">
         </activity>
-        <activity android:name=".activity.DividendHistoryActivity"/>
+        <activity android:name=".view.history.DividendHistoryActivity"/>
     </application>
 
 </manifest>

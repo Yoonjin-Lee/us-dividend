@@ -1,6 +1,5 @@
-package com.example.usdividend
+package com.example.usdividend.view.setting
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -12,11 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.usdividend.R
 import com.example.usdividend.view.LogoutDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
@@ -24,7 +26,7 @@ import com.example.usdividend.ui.theme.Red
 
 @Composable
 fun SettingView(
-    context : Context
+    settingViewModel: SettingViewModel = hiltViewModel()
 ) {
     Column {
         Spacer(
@@ -33,21 +35,31 @@ fun SettingView(
                 .height(0.5.dp)
                 .background(Color.White)
         )
-        SettingTop()
-        SettingAccount(context = context)
+        SettingTitle(
+            settingViewModel
+        )
+        SettingEmail(settingViewModel)
     }
 }
 
 @Composable
-fun SettingTop() {
+fun SettingTitle(
+    settingViewModel: SettingViewModel = hiltViewModel()
+) {
+    var nickname : String? = null
+    settingViewModel.nickname.observe(LocalLifecycleOwner.current){
+        nickname = it
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Main),
         contentAlignment = Alignment.CenterStart
     ) {
+        //닉네임
         Text(
-            text = "",
+            text = nickname!!,
             modifier = Modifier.padding(12.dp, 20.dp),
             style = TextStyle(
                 fontSize = 20.sp,
@@ -59,9 +71,14 @@ fun SettingTop() {
 }
 
 @Composable
-fun SettingAccount(
-    context: Context
+fun SettingEmail(
+    settingViewModel: SettingViewModel = hiltViewModel()
 ) {
+    var email : String? = null
+    settingViewModel.email.observe(LocalLifecycleOwner.current){
+        email = it
+    }
+
     Column {
         Text(
             text = stringResource(id = R.string.account),
@@ -78,8 +95,9 @@ fun SettingAccount(
                 .height(1.dp)
                 .background(Gray)
         )
+        // 이메일
         Text(
-            text = "",
+            text = email!!,
             style = TextStyle(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Normal,
@@ -94,16 +112,17 @@ fun SettingAccount(
                 .background(Gray)
         )
 
-        var isClicked by remember {
+        var logoutIsClicked by remember {
             mutableStateOf(false)
         }
 
-        if (isClicked) {
-            LogoutDialog(v = true, context = context)
+        if (logoutIsClicked) {
+            LogoutDialog(settingViewModel)
         }
 
+        // 로그아웃 버튼
         TextButton(onClick = {
-            isClicked = true
+            logoutIsClicked = true
         }) {
             Text(
                 text = stringResource(id = R.string.logout),

@@ -22,7 +22,15 @@ interface UserDao {
     @Query("SELECT user_email FROM userdata WHERE user_name = :userName")
     fun findEmailByName(userName : String) : String
 
-    //user_email
+    //user_email로 user_name 찾기
     @Query("SELECT user_name FROM userdata WHERE user_email = :userEmail")
     fun findNameByEmail(userEmail : String) : String
+
+    // user_email 받기
+    @Query("SELECT user_email FROM USERDATA WHERE user_id = :userId")
+    fun getEmail(userId : Int) : String
+
+    // user_name 받기
+    @Query("SELECT user_name FROM USERDATA WHERE user_id = :userId")
+    fun getName(userId: Int) : String
 }
