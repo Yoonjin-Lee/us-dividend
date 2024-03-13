@@ -13,6 +13,17 @@
 ---
 ![android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white) ![kotlin](https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white)  
 
+  Jetpack Compose | Kotlin | Github  
+  Retrofit2 | Okhttp3 라이브러리 사용
+  
+  MVVM 모델 + Hilt(DI) 사용 구조로 리팩토링 진행
+  - LiveData를 이용한 observer 패턴 구현
+  - View의 LifeCycle에 따른 데이터 수신
+  - 리팩토링 과정 블로그 작성
+
+Room 데이터베이스 사용
+- 내부 정보를 저장하여, 서버 없이 기능 사용 가능
+
 프로젝트 소개
 ---
 #### 얼마나 받았지? 이걸로 재투자해야 하는데..  
