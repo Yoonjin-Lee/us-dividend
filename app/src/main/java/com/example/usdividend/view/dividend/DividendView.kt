@@ -1,7 +1,6 @@
-package com.example.usdividend
+package com.example.usdividend.view.dividend
 
-import android.content.Context
-import android.content.Intent
+import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -21,61 +22,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.usdividend.view.history.DividendHistoryActivity
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.usdividend.R
+import com.example.usdividend.data.type.DividendData
 import com.example.usdividend.view.DividendDialog
 import com.example.usdividend.ui.theme.Gray
 import com.example.usdividend.ui.theme.Main
-import com.example.usdividend.ui.theme.UsDividendTheme
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Composable
-fun DividendScreen(
-    context: Context,
-    sharedViewModel: SharedViewModel = viewModel()
+@ViewModelScoped
+fun DividendView(
+    viewModel: DividendViewModel = hiltViewModel()
 ) {
-
-    // dialog 에서 변경된 값을 가지고 리스트 요소 삭제
-    if (sharedViewModel.myVariable) {
-        companyList.remove(sharedViewModel.myCompany)
-        sharedViewModel.myVariable = false
-    }
-
-    var getDividendHistory by remember {
-        mutableStateOf(true)
-    }
-
-    val cList = remember {
+    val companyList = remember {
         mutableStateListOf<String>()
     }
 
-    /************배당 목록 가져오기************/
-    if (getDividendHistory) {
-        for (i in companyList){
-            cList.add(i)
-        }
-
-        getDividendHistory = false
+    val dividendList = remember {
+        mutableStateListOf<DividendData>()
     }
+
+    /************주식 이름 목록 가져오기************/
+    viewModel.stockNameList.observe(LocalLifecycleOwner.current) {
+//        if (viewModel.justOneTime.value){
+            companyList.addAll(it)
+            Log.d("company", "$it")
+            viewModel.justOneTime.value = false
+//        }
+    }
+
+    /************배당 목록 가져오기*************/
+    viewModel.dividendList.observe(LocalLifecycleOwner.current) {
+        dividendList.clear()
+        dividendList.addAll(it)
+    }
+
 
     // BarChart data
     val entries: ArrayList<BarEntry> = ArrayList()
     val monthDividend: Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
     for (i: Int in 0 until dividendList.size) {
-        monthDividend[dividendList[i].createdMonth - 1] += dividendList[i].dividend
+        monthDividend[dividendList[i].month.toInt() - 1] += dividendList[i].stockDividend.toFloat()
     }
     entries.apply {
         entries.add(BarEntry(1f, monthDividend[0]))
@@ -95,16 +101,15 @@ fun DividendScreen(
     Column(
         verticalArrangement = Arrangement.Top
     ) {
-        DollarPart()
-        MonthlyList(cList)
+        DollarPart(viewModel)
+        MonthlyList(companyList, viewModel)
         DividedTitle(text = stringResource(id = R.string.table_title))
         BarChartView(data = entries)
         Row {
             Spacer(modifier = Modifier.weight(1f))
             TextButton(
                 onClick = {
-                    val intent = Intent(context, DividendHistoryActivity::class.java)
-                    startActivity(context, intent, null)
+                    viewModel.move()
                 }
             ) {
                 Text(
@@ -127,13 +132,21 @@ fun DividendScreen(
 
 @Composable
 fun DollarPart(
-    sharedViewModel: SharedViewModel = viewModel()
+    viewModel: DividendViewModel = hiltViewModel()
 ) {
+    val dollar = remember {
+        mutableStateOf("")
+    }
+
+    viewModel.dollar.observe(LocalLifecycleOwner.current) {
+        dollar.value = it
+    }
     Box(
         Modifier
             .background(Gray, RectangleShape)
             .fillMaxWidth()
-            .padding(17.dp, 22.dp)
+            .padding(17.dp, 10.dp)
+            .defaultMinSize(minHeight = 40.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -145,32 +158,45 @@ fun DollarPart(
                     fontWeight = FontWeight.Medium
                 )
             )
+            Spacer(modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp))
             Text(
-//                text = sharedViewModel.dollars.toString(),
-                text = "",
+                text = dollar.value,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
             )
+            IconButton(onClick = {
+                viewModel.getDollar()
+            }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
+                    contentDescription = stringResource(id = R.string.reset)
+                )
+            }
         }
     }
 }
 
 @Composable
 fun MonthlyList(
-    companyList: SnapshotStateList<String>
+    companyList: SnapshotStateList<String>,
+    viewModel: DividendViewModel = hiltViewModel()
 ) {
+    var month = ""
+    viewModel.month.observe(LocalLifecycleOwner.current) {
+        month = it
+    }
     Modifier
         .fillMaxWidth()
-        .height(112.dp)
+        .height(100.dp)
     Column {
         //Title part
         Row(
             Modifier.padding(14.dp)
         ) {
             Text(
-                text = "3",
+                text = month,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -189,7 +215,7 @@ fun MonthlyList(
                 .padding(18.dp, 0.dp)
                 .height(80.dp)
         ) {
-                CompanyList(companyList = companyList)
+            CompanyList(companyList = companyList)
         }
     }
 }
@@ -200,21 +226,32 @@ fun CompanyList(
 ) {
     LazyColumn() {
         items(companyList) {
-            CompanyListCard(it)
+            CompanyListCard(it, companyList)
         }
     }
 }
 
 @Composable
 fun CompanyListCard(
-    company: String
+    company: String,
+    companyList: SnapshotStateList<String>
 ) {
     // show dialog
     var isClicked by remember {
         mutableStateOf(false)
     }
     if (isClicked) {
-        DividendDialog(v = true, company)
+        DividendDialog(
+            true,
+            company,
+            onNegativeClick = {
+                isClicked = !isClicked
+            },
+            onPositiveClick = {
+                companyList.remove(company)
+                isClicked = !isClicked
+            }
+        )
     }
 
     Row(
@@ -265,7 +302,7 @@ fun BarChartView(data: ArrayList<BarEntry>) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(235.dp)
+            .height(220.dp)
     ) {
         AndroidView(
             modifier = Modifier
@@ -298,14 +335,5 @@ fun BarChartView(data: ArrayList<BarEntry>) {
                 chart.invalidate()
             }
         )
-    }
-}
-
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewDividendScreen() {
-    UsDividendTheme {
-//        DividendScreen()
     }
 }

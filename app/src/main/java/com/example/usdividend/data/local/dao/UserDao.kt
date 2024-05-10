@@ -1,5 +1,6 @@
 package com.example.usdividend.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -33,4 +34,12 @@ interface UserDao {
     // user_name 받기
     @Query("SELECT user_name FROM USERDATA WHERE user_id = :userId")
     fun getName(userId: Int) : String
+
+    // 보유 달러 업데이트
+    @Query("UPDATE USERDATA SET holding_dollar = :newDollar WHERE user_id = 0")
+    fun updateHoldingdollar(newDollar : Float)
+
+    // holding_dollar 받기
+    @Query("SELECT holding_dollar FROM USERDATA WHERE user_id = 0")
+    fun getHoldingdollar() : Float
 }

@@ -69,21 +69,21 @@ fun StockListDump(stockListCard: StockListCard) {
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = stringResource(id = R.string.quantity) + "$stockListCard.quantity",
+                    text = stringResource(id = R.string.quantity) + stockListCard.quantity,
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.exchange) + "$stockListCard.exchange",
+                    text = stringResource(id = R.string.exchange) + stockListCard.exchange,
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.price) + "$stockListCard.price",
+                    text = stringResource(id = R.string.price) + stockListCard.price,
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium

@@ -94,6 +94,7 @@ class LoginViewModel @Inject constructor(
                             MainActivity::class.java
                         )
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         startActivity(context, intent, null)
 
                         /********************서버 연결***********************/
@@ -195,6 +196,7 @@ class LoginViewModel @Inject constructor(
                                 MainActivity::class.java
                             )
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             startActivity(context, intent, null)
 
                             /********************서버 연결***********************/
@@ -288,6 +290,7 @@ class LoginViewModel @Inject constructor(
                     MainActivity::class.java
                 )
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(context, intent, null)
 
                 /********************서버 연결***********************/

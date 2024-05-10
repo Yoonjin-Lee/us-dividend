@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.usdividend.R
 import com.example.usdividend.data.local.AppDatabase
+import com.example.usdividend.data.local.dao.CompanyDao
 import com.example.usdividend.data.local.dao.DividendDao
 import com.example.usdividend.data.local.dao.StockDao
 import com.example.usdividend.data.local.dao.UserDao
@@ -39,4 +40,8 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun provideDividendDAO(database: AppDatabase) : DividendDao = database.dividendDao()
+
+    @Provides
+    @Singleton
+    fun provideCompanyDAO(database: AppDatabase) : CompanyDao = database.companyDao()
 }
