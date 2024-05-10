@@ -67,49 +67,7 @@ fun DividendScreen(
         for (i in companyList){
             cList.add(i)
         }
-//        authService.getDividendHistory(userId = userid!!).enqueue(object : Callback<String> {
-//            override fun onResponse(call: Call<String>, response: Response<String>) {
-//                if (response.isSuccessful) {
-//                    val data = JSONObject(response.body().toString()).getJSONArray("result")
-//
-//                    if (data != null) {
-//                        //데이터가 잘 왔는지 로그 찍어보기
-//                        Log.d("retrofit", "배당 목록 가져오기")
-//                        Log.d("test_retrofit", "받은 정보 :" + data)
-//
-//                        val list = ArrayList<JSONObject>()
-//
-//                        for (i in 0 until data.length()) {
-//                            list.add(
-//                                data.getJSONObject(i)
-//                            )
-//                        }
-//
-//                        for (i in list) {
-//                            //배당 리스트에 등록
-//                            dividendList.add(
-//                                DividendListData(
-//                                    stockName = i.getString("stockName"),
-//                                    dividend = i.getString("dividend").toFloat(),
-//                                    createdMonth = i.getString("createdAt").toString()
-//                                        .split("-")[1].toInt()
-//                                )
-//                            )
-//                            Log.d("retrofit", "dividendList : ${dividendList}")
-//                        }
-//                    } else {
-//                        //정보를 받지 못했을 때 로그 찍기
-//                        Log.d("retrofit", "배당 목록 가져오기")
-//                        Log.w("retrofit", "실패 ${response.code()}")
-//                    }
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<String>, t: Throwable) {
-//                Log.d("retrofit", "배당 목록 가져오기")
-//                Log.w("retrofit", "실패", t)
-//            }
-//        })
+
         getDividendHistory = false
     }
 

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.usdividend.R
 import com.example.usdividend.SharedViewModel
@@ -35,8 +36,7 @@ import com.example.usdividend.ui.theme.Main
 
 @Composable
 fun StockInputScreen(
-    context: Context,
-    sharedViewModel: SharedViewModel = viewModel()
+    stockInputViewModel: StockInputViewModel = hiltViewModel()
 ) {
     val cur = LocalContext.current
     Scaffold(
