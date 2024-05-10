@@ -6,8 +6,11 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class DividendData (
-    @PrimaryKey val userId : Int,
+    @ColumnInfo("user_id") val userId : Int,
     @ColumnInfo("stock_name") val stockName : String,
     @ColumnInfo("stock_dividend") val stockDividend : String,
     @ColumnInfo("month") val month : String
-)
+){
+    @PrimaryKey(autoGenerate = true)
+    var idx = 0
+}

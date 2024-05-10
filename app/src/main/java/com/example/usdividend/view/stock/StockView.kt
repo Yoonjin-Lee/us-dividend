@@ -1,6 +1,5 @@
 package com.example.usdividend.view.stock
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.MutableLiveData
 import com.example.usdividend.R
 import com.example.usdividend.data.type.StockListCard
 import com.example.usdividend.ui.theme.Gray
@@ -34,6 +35,14 @@ fun StockView(
 ) {
     val stockCardList = remember{
         mutableStateListOf<StockListCard>()
+    }
+
+    var dollar = remember {
+        mutableStateOf("")
+    }
+
+    viewModel.dollar.observe(LocalLifecycleOwner.current){
+        dollar.value = it
     }
 
     // viewModel로부터 stockList를 받아 stockListCard 형태로 변환
@@ -48,16 +57,6 @@ fun StockView(
                 )
             )
         }
-    }
-
-    var getStockList by remember {
-        mutableStateOf(true)
-    }
-
-    if (getStockList) {
-        //로그인 시 받은 보유 달러 저장
-
-        getStockList = false
     }
 
     Column(
@@ -122,12 +121,20 @@ fun StockView(
                 )
                 Spacer(modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp))
                 Text(
-                    text = "",
+                    text = dollar.value,
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
                     )
                 )
+                IconButton(onClick = {
+                    viewModel.getDollar()
+                }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.reset_icon),
+                        contentDescription = stringResource(id = R.string.reset)
+                    )
+                }
             }
         }
         // Table part

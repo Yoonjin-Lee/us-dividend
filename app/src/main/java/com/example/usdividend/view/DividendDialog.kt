@@ -20,23 +20,26 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.usdividend.R
-import com.example.usdividend.SharedViewModel
 import com.example.usdividend.ui.theme.Main
-import com.example.usdividend.ui.theme.UsDividendTheme
+import com.example.usdividend.view.dividend.DividendViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun DividendDialog(
     v: Boolean,
     company: String,
-    sharedViewModel: SharedViewModel = viewModel()
+    viewModel: DividendViewModel = hiltViewModel(),
+    onNegativeClick: () -> Unit,
+    onPositiveClick: () -> Unit
 ) {
     var visible by remember {
         mutableStateOf(v)
@@ -87,7 +90,9 @@ fun DividendDialog(
                     )
                     Row {
                         TextButton( // no
-                            onClick = { visible = false },
+                            onClick = {
+                                onNegativeClick()
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .background(colorResource(id = R.color.dismiss))
@@ -104,65 +109,18 @@ fun DividendDialog(
                         }
                         TextButton( // yes
                             onClick = {
-                                sharedViewModel.myCompany = company
-                                sharedViewModel.myVariable = true
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    /********배당금 데이터베이스 삽입*******/
+                                    viewModel.insertDividend(company)
+                                    /*******보유 달러 업데이트*******/
+                                    viewModel.updateHoldingdollar(company)
+                                    viewModel.getDollar()
+                                    /*********화면 리스트에서 삭제*******/
+                                    onPositiveClick()
+                                    /*********데이터 베이스 삭제********/
+                                    viewModel.deleteCompany(company)
+                                }
                                 visible = false
-
-//                                /**********배당금 로그 보내기*********/
-//                                authService.postDividend(
-//                                    ServerPostDividend(
-//                                        holdingId = hId,
-//                                        userId = userid!!,
-//                                        stockId = sId,
-//                                        quantity = q
-//                                    )
-//                                ).enqueue(object : Callback<String>{
-//                                    override fun onResponse(
-//                                        call: Call<String>,
-//                                        response: Response<String>
-//                                    ) {
-//                                        if (response.isSuccessful) {
-//                                            val data = response.body()
-//
-//                                            if (data != null) {
-//                                                //데이터가 잘 왔는지 로그 찍어보기
-//                                                Log.d("retrofit", "배당금 로그 전송")
-//                                                Log.d("test_retrofit", "받은 정보 :" + data)
-//
-//                                            } else {
-//                                                //정보를 받지 못했을 때 로그 찍기
-//                                                Log.w("retrofit", "배당금 로그 전송 실패 ${response.code()}")
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    override fun onFailure(call: Call<String>, t: Throwable) {
-//                                        Log.w("retrofit", "배당 로그 전송 실패", t)
-//                                    }
-//                                })
-//
-//                                /**********보유 달러 변경***********/
-//                                authService.getDollars(userid!!).enqueue(object : Callback<String>{
-//                                    override fun onResponse(call: Call<String>, response: Response<String>) {
-//                                        if (response.isSuccessful){
-//                                            val data = JSONObject(response.body().toString()).getString("result")
-//
-//                                            if (data!=null){
-//                                                sharedViewModel.dollars = data.toFloat()
-//                                                holdingDollars = data.toFloat()
-//                                                Log.d("retrofit", "보유 달러 데이터 : ${data}")
-//                                            } else {
-//                                                Log.d("retrofit", "보유 달러 데이터 없음")
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    override fun onFailure(call: Call<String>, t: Throwable) {
-//                                        Log.d("retrofit", "보유 달러 업데이트")
-//                                        Log.w("retrofit", "정보 접근 실패", t)
-//                                    }
-//                                })
-
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -182,13 +140,5 @@ fun DividendDialog(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewDividendDialog() {
-    UsDividendTheme {
-        DividendDialog(true, "")
     }
 }

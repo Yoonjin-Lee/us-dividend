@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.usdividend.DividendScreen
+import com.example.usdividend.view.dividend.DividendView
 import com.example.usdividend.view.dividend.DividendViewModel
 import com.example.usdividend.view.setting.SettingView
 import com.example.usdividend.view.setting.SettingViewModel
@@ -22,7 +22,7 @@ fun NavigationGraph(
 ) {
     NavHost(navController = navController, startDestination = "stockScreen") {
         composable("dividendScreen") {
-            DividendScreen(context)
+            DividendView(dividendViewModel)
         }
         composable("stockScreen") {
             StockView(stockViewModel)
