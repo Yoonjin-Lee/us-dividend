@@ -120,6 +120,7 @@ fun DividendDialog(
                                     /*********데이터 베이스 삭제********/
                                     viewModel.deleteCompany(company)
                                 }
+
                                 visible = false
                             },
                             modifier = Modifier

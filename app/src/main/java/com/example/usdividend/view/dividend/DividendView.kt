@@ -47,64 +47,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.android.scopes.ViewScoped
 
 @Composable
-@ViewModelScoped
+@ViewScoped
 fun DividendView(
     viewModel: DividendViewModel = hiltViewModel()
 ) {
-    val companyList = remember {
-        mutableStateListOf<String>()
-    }
-
-    val dividendList = remember {
-        mutableStateListOf<DividendData>()
-    }
-
-    /************주식 이름 목록 가져오기************/
-    viewModel.stockNameList.observe(LocalLifecycleOwner.current) {
-//        if (viewModel.justOneTime.value){
-            companyList.addAll(it)
-            Log.d("company", "$it")
-            viewModel.justOneTime.value = false
-//        }
-    }
-
-    /************배당 목록 가져오기*************/
-    viewModel.dividendList.observe(LocalLifecycleOwner.current) {
-        dividendList.clear()
-        dividendList.addAll(it)
-    }
-
-
-    // BarChart data
-    val entries: ArrayList<BarEntry> = ArrayList()
-    val monthDividend: Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-    for (i: Int in 0 until dividendList.size) {
-        monthDividend[dividendList[i].month.toInt() - 1] += dividendList[i].stockDividend.toFloat()
-    }
-    entries.apply {
-        entries.add(BarEntry(1f, monthDividend[0]))
-        entries.add(BarEntry(2f, monthDividend[1]))
-        entries.add(BarEntry(3f, monthDividend[2]))
-        entries.add(BarEntry(4f, monthDividend[3]))
-        entries.add(BarEntry(5f, monthDividend[4]))
-        entries.add(BarEntry(6f, monthDividend[5]))
-        entries.add(BarEntry(7f, monthDividend[6]))
-        entries.add(BarEntry(8f, monthDividend[7]))
-        entries.add(BarEntry(9f, monthDividend[8]))
-        entries.add(BarEntry(10f, monthDividend[9]))
-        entries.add(BarEntry(11f, monthDividend[10]))
-        entries.add(BarEntry(12f, monthDividend[11]))
-    }
-
     Column(
         verticalArrangement = Arrangement.Top
     ) {
         DollarPart(viewModel)
-        MonthlyList(companyList, viewModel)
+        MonthlyList()
         DividedTitle(text = stringResource(id = R.string.table_title))
-        BarChartView(data = entries)
+        BarChartView()
         Row {
             Spacer(modifier = Modifier.weight(1f))
             TextButton(
@@ -134,13 +90,7 @@ fun DividendView(
 fun DollarPart(
     viewModel: DividendViewModel = hiltViewModel()
 ) {
-    val dollar = remember {
-        mutableStateOf("")
-    }
-
-    viewModel.dollar.observe(LocalLifecycleOwner.current) {
-        dollar.value = it
-    }
+    val dollar by viewModel.dollar.observeAsState()
     Box(
         Modifier
             .background(Gray, RectangleShape)
@@ -160,7 +110,7 @@ fun DollarPart(
             )
             Spacer(modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp))
             Text(
-                text = dollar.value,
+                text = dollar!!,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -180,7 +130,6 @@ fun DollarPart(
 
 @Composable
 fun MonthlyList(
-    companyList: SnapshotStateList<String>,
     viewModel: DividendViewModel = hiltViewModel()
 ) {
     var month = ""
@@ -215,18 +164,21 @@ fun MonthlyList(
                 .padding(18.dp, 0.dp)
                 .height(80.dp)
         ) {
-            CompanyList(companyList = companyList)
+            CompanyList()
         }
     }
 }
 
 @Composable
 fun CompanyList(
-    companyList: SnapshotStateList<String>
+    viewModel : DividendViewModel = hiltViewModel()
 ) {
+    /************주식 이름 목록 가져오기*************/
+    val stockNameList by viewModel.stockNameList.observeAsState(initial = emptyList())
+
     LazyColumn() {
-        items(companyList) {
-            CompanyListCard(it, companyList)
+        items(stockNameList) {
+            CompanyListCard(it, stockNameList.toMutableStateList())
         }
     }
 }
@@ -293,9 +245,35 @@ fun DividedTitle(
 }
 
 @Composable
-fun BarChartView(data: ArrayList<BarEntry>) {
+fun BarChartView(
+    viewModel: DividendViewModel = hiltViewModel()
+) {
 //    val entries = data.mapIndexed { index, pair -> BarEntry(index.toFloat(), pair.second) }
-    val dataSet = BarDataSet(data, "Values")
+    /************배당 목록 가져오기*************/
+    val dividendList by viewModel.dividendList.observeAsState(initial = emptyList())
+
+    // BarChart data
+    val entries: ArrayList<BarEntry> = ArrayList()
+    val monthDividend: Array<Float> = arrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+    for (i: Int in 0 until dividendList.size) {
+        monthDividend[dividendList[i].month.toInt() - 1] += dividendList[i].stockDividend.toFloat()
+    }
+    entries.apply {
+        entries.add(BarEntry(1f, monthDividend[0]))
+        entries.add(BarEntry(2f, monthDividend[1]))
+        entries.add(BarEntry(3f, monthDividend[2]))
+        entries.add(BarEntry(4f, monthDividend[3]))
+        entries.add(BarEntry(5f, monthDividend[4]))
+        entries.add(BarEntry(6f, monthDividend[5]))
+        entries.add(BarEntry(7f, monthDividend[6]))
+        entries.add(BarEntry(8f, monthDividend[7]))
+        entries.add(BarEntry(9f, monthDividend[8]))
+        entries.add(BarEntry(10f, monthDividend[9]))
+        entries.add(BarEntry(11f, monthDividend[10]))
+        entries.add(BarEntry(12f, monthDividend[11]))
+    }
+
+    val dataSet = BarDataSet(entries, "Values")
     dataSet.setColors(R.color.main_color)
     val barData = BarData(dataSet)
 
