@@ -1,17 +1,15 @@
 package com.example.usdividend.function
 
 import android.content.Context
-import com.example.usdividend.dividendList
+import com.example.usdividend.data.type.DividendListData
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileOutputStream
 
-
-// dataList = DividendHistoryList
-
 fun excel(
-    context : Context
+    context: Context,
+    dividendList : ArrayList<DividendListData>
 ){
     val workbook = XSSFWorkbook()
 
